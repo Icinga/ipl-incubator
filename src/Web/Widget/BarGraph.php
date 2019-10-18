@@ -78,6 +78,7 @@ class BarGraph extends BaseHtmlElement
         foreach ($this->dataSets as $key => $dataSet) {
             $graph[] = $this->drawDataSet($key, $dataSet);
         }
+        $graph[] = $this->drawBaseline();
 
         $this->setContent($graph);
 
@@ -114,8 +115,6 @@ class BarGraph extends BaseHtmlElement
      */
     protected function drawGrid()
     {
-        $graphMarginTop = $this->graphHeight + $this->outerMarginTop;
-
         $lines = [];
         for ($i = 1; $i <= $this->getAmountLines(); $i++) {
 
@@ -158,7 +157,17 @@ class BarGraph extends BaseHtmlElement
             );
         }
 
-        $lines[] = new HtmlElement(
+        return new HtmlElement('g', new Attributes(['class' => 'bar-grid']), $lines);
+    }
+
+    /**
+     * @return HtmlElement
+     */
+    protected function drawBaseline()
+    {
+        $graphMarginTop = $this->graphHeight + $this->outerMarginTop;
+
+        return new HtmlElement(
             'g',
             new Attributes(['class' => 'bottom-line']),
             [
@@ -187,8 +196,6 @@ class BarGraph extends BaseHtmlElement
                 )
             ]
         );
-
-        return new HtmlElement('g', new Attributes(['class' => 'bar-grid']), $lines);
     }
 
     /**
@@ -246,8 +253,6 @@ class BarGraph extends BaseHtmlElement
                 $this->getAmountLines() * $graphData['jump'],
                 $this->graphHeight
             );
-
-            //todo: think of something for values < 2 (border radius > height looks buggy)
 
             $graphText = new HtmlElement(
                 'text',
@@ -312,6 +317,10 @@ class BarGraph extends BaseHtmlElement
      */
     protected function getPathString($height, $width)
     {
+        if ($height <= 1) {
+            return '';
+        }
+
         $path = sprintf(
             'M3,0 L%1$s,0 C%2$s.6568542,-3.04359188e-16 %3$s,1.34314575 %3$s,3 L%3$s,%4$s L%3$s,%4$s L0,%4$s L0,3',
             $width - 3,
