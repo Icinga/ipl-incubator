@@ -16,6 +16,8 @@ class HorizontalBar extends BaseHtmlElement
 
     protected $title;
 
+    protected $graphData = [];
+
     protected $outerMarginLeft = 30;
 
     protected $outerMarginTop = 8;
@@ -26,27 +28,38 @@ class HorizontalBar extends BaseHtmlElement
 
     protected $barWidth = 10;
 
-    public function __construct($title, $data, Attributes $attributes = null)
+    public function __construct($title, $value, Attributes $attributes = null, $uom = null, $warn = null, $crit = null, $min = null, $max = null)
     {
         $this->addAttributes($attributes);
-        $this->addAttributes(['viewbox' => '0 0 ' . $this->totalWidth . ' ' . (2 * $this->outerMarginTop + $this->barWidth)]);
-        $this->setData($data);
-        $this->title = $title;
+        $this->addAttributes(['viewbox' => sprintf(
+            '0 0 %s %s',
+            $this->totalWidth,
+            (2 * $this->outerMarginTop + $this->barWidth)
+        )]);
 
+        $this->title = $title;
+        $this->setData($value, $uom, $warn, $crit, $min, $max);
     }
 
-    public function setData($data)
+    public function setData($value, $uom = null, $warn = null, $crit = null, $min = null, $max = null)
     {
-        //todo: verify!!!
+        $this->data['value'] = $value;
+        $this->data['uom'] = $uom;
 
-        $this->data['value'] = $data[0];
-        $this->data['uom'] = $data[1];   // null valid
+        $this->data['warn'] = $warn;
+        $this->data['crit'] = $crit;
 
-        $this->data['warn'] = $data[2];  // null valid
-        $this->data['crit'] = $data[3];  // null valid
+        $this->data['min'] = $min ?: min($value, 0);
+        $this->data['max'] = $max ?: max($value, $warn, $crit);
 
-        $this->data['min'] = $data[4];   // if no min given -> if if 0 smaller min -> min
-        $this->data['max'] = $data[5];   // if no max given -> largest value
+        $this->calculateGraphData();
+    }
+
+    protected function calculateGraphData() {
+        $this->graphData['bar-x'] = $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5;
+        $this->graphData['bar-width'] = $this->totalWidth / 2;
+
+        $this->graphData['zero'] = $this->getRelativeValue(0 - $this->data['min'], $this->data['max'] - $this->data['min'], $this->graphData['bar-width']);
     }
 
     public function draw()
@@ -89,9 +102,9 @@ class HorizontalBar extends BaseHtmlElement
                 'rect',
                 new Attributes(
                     [
-                        'x' => $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5,
+                        'x' => $this->graphData['bar-x'],
                         'y' => $this->outerMarginTop,
-                        'width' => $this->totalWidth / 2,
+                        'width' => $this->graphData['bar-width'],
                         'height' => $this->barWidth,
                         'rx' => 4,
                         'fill' => 'lightgray'
@@ -106,9 +119,6 @@ class HorizontalBar extends BaseHtmlElement
 
     protected function drawBar()
     {
-        $barLength = $this->totalWidth / 2;
-        $length = $this->getRelativeValue($this->data['value'],  $this->data['max'], $barLength);
-
         $warn = $this->data['warn'];
         if ($warn !== null) {
             $warn = $this->drawThreshold($warn, 'warning');
@@ -119,49 +129,104 @@ class HorizontalBar extends BaseHtmlElement
             $crit = $this->drawThreshold($crit, 'critical');
         }
 
-        $bar = [
-            new HtmlElement(
-                'rect',
-                new Attributes(
-                    [
-                        'x' => $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5,
-                        'y' => $this->outerMarginTop,
-                        'width' => $length,
-                        'height' => $this->barWidth,
-                        'rx' => 4,
-                        'class' => sprintf('bar-%s', $this->getBarFill())
-                    ]
-                )
-            ),
-            $warn,
-            $crit,
-        ];
+        $value = $this->getRelativeValue($this->data['value'], $this->data['max'] - $this->data['min'], $this->graphData['bar-width']);
+
+        $start = min($this->graphData['zero'], $value);
+        $end = max($this->graphData['zero'], $value);
+
+        if ($this->data['min'] < 0) {
+            if ($this->data['value'] > 0) {
+                $path = sprintf(
+                    'M0,0'
+                    . 'l%s,0 '
+                    . 'q4,0 4,4 '
+                    . 'l0,%s '
+                    . 'q0,4 -4,4 '
+                    . 'l-%s,0',
+                    $value - 4,
+                    $this->barWidth - 8,
+                    $value - 4
+                );
+
+                $xPos = $this->graphData['zero'];
+            } else {
+                $path = sprintf(
+                    'M4,0'
+                    . 'l%s,0 '
+                    . 'l0,%s '
+                    . 'l-%s,0 '
+                    . 'q-4,0 -4,-4 '
+                    . 'l0,-%s '
+                    . 'q0,-4 4,-4',
+                    - $value - 4,
+                    $this->barWidth,
+                    - $value - 4,
+                    $this->barWidth - 8
+                );
+
+                $xPos = $this->graphData['zero'] + $value;
+            }
+
+            $bar = [
+                new HtmlElement(
+                    'path',
+                    new Attributes(
+                        [
+                            'transform' => sprintf('translate(%s,%s)', $this->graphData['bar-x'] + $xPos, $this->outerMarginTop),
+                            'height' => $this->barWidth,
+                            'd' => $path,
+                            'class' => sprintf('bar-%s', $this->getBarFill())
+                        ]
+                    )
+                ),
+                $warn,
+                $crit,
+            ];
+        } else {
+            $bar = [
+                new HtmlElement(
+                    'rect',
+                    new Attributes(
+                        [
+                            'x' => $this->graphData['bar-x'],
+                            'y' => $this->outerMarginTop,
+                            'width' => $end - $start,
+                            'height' => $this->barWidth,
+                            'rx' => 4,
+                            'class' => sprintf('bar-%s', $this->getBarFill())
+                        ]
+                    )
+                ),
+                $warn,
+                $crit,
+            ];
+        }
 
         return $bar;
     }
 
     protected function drawThreshold($threshold, $kind)
     {
-        $barLength = $this->totalWidth / 2;
-
         $col = $kind;
         if ($this->getBarFill() === $kind) {
             $col = 'black';
         }
 
         if ($threshold === $this->data['max']) {
-            $path = 'M0.5,0.5'
+            $path = sprintf('M0.5,0.5'
                 . 'l1,0 '
-                . 'q3,0 3,3 '
-                . 'l0,3 '
-                . 'q0,3 -3,3 '
-                . 'l-1,0';
+                . 'q4,0 4,4 '
+                . 'l0,%s '
+                . 'q0,4 -4,4 '
+                . 'l-1,0',
+            $this->barWidth - 9
+            );
 
             return new HtmlElement(
                 'path',
                 new Attributes(
                     [
-                        'transform' => sprintf('translate(%s,%s)', $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5 + $barLength - 5, $this->outerMarginTop),
+                        'transform' => sprintf('translate(%s,%s)', $this->graphData['bar-x'] + $this->graphData['bar-width'] - 5, $this->outerMarginTop),
                         'd' => $path,
                         'width' => 1,
                         'height' => $this->barWidth,
@@ -171,13 +236,13 @@ class HorizontalBar extends BaseHtmlElement
             );
         }
 
-        $threshold = $this->getRelativeValue($threshold,  $this->data['max'], $barLength);
+        $threshold = $this->getRelativeValue($threshold, $this->data['max'] - $this->data['min'], $this->graphData['bar-width']);
 
         return new HtmlElement(
             'rect',
             new Attributes(
                 [
-                    'x' => $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5 + $threshold,
+                    'x' => $this->graphData['bar-x'] + $threshold + $this->graphData['zero'],
                     'y' => $this->outerMarginTop,
                     'width' => 1,
                     'height' => $this->barWidth,
@@ -199,7 +264,6 @@ class HorizontalBar extends BaseHtmlElement
         return ($value / $relativeMax * 100) * $absoluteMax / 100;
     }
 
-
     protected function getBarFill()
     {
         $value = $this->data['value'];
@@ -207,6 +271,9 @@ class HorizontalBar extends BaseHtmlElement
         $crit = $this->data['crit'];
 
         if ($warn === null && $crit === null) {
+            if ($this->data['value'] < 0) {
+                return 'light-blue';
+            }
             return 'blue';
         } elseif ($crit !== null && $value > $crit) {
             return 'critical';
@@ -219,6 +286,8 @@ class HorizontalBar extends BaseHtmlElement
 
     protected function drawValues()
     {
+        //todo: change font values to match mockups
+
         $unit = [];
         if (isset($this->data['uom'])) {
             $unit = new HtmlElement(
@@ -244,7 +313,7 @@ class HorizontalBar extends BaseHtmlElement
                 'class'         => 'svg-text',
                 'fill'          => 'gray',
                 'dominant-baseline' => 'central',
-                'x'             => $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5 + $this->totalWidth / 2 + $this->textMargin,
+                'x'             => $this->graphData['bar-x'] + $this->graphData['bar-width'] + $this->textMargin,
                 'y'             => $this->outerMarginTop + $this->barWidth / 2,
             ]),
             [
