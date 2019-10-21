@@ -11,6 +11,8 @@ class BarGraph extends BaseHtmlElement
 {
     protected $tag = 'svg';
 
+    protected $defaultAttributes = ['class' => 'vertical-bar-graph'];
+
     protected $dataSets = [];
 
     protected $graphData = [];
@@ -28,8 +30,6 @@ class BarGraph extends BaseHtmlElement
     protected $textMargin = 5;
 
     protected $barWidth = 20;
-
-    protected $defaultAttributes = ['class' => 'bar-graph'];
 
     /**
      * BarGraph constructor.
@@ -322,11 +322,17 @@ class BarGraph extends BaseHtmlElement
         }
 
         $path = sprintf(
-            'M3,0 L%1$s,0 C%2$s.6568542,-3.04359188e-16 %3$s,1.34314575 %3$s,3 L%3$s,%4$s L%3$s,%4$s L0,%4$s L0,3',
-            $width - 3,
-            $width - 2,
-            $width,
-            $height
+            'M4,0 '
+            . 'l%s,0 '
+            . 'q4,0 4,4 '
+            . 'l0,%s '
+            . 'l-%s,0 '
+            . 'l0,-%s '
+            . 'q0,-4 4,-4',
+            $this->barWidth - 8,
+            $height - 4,
+            $this->barWidth,
+            $height - 4
         );
 
         return $path . ' C-2.02906125e-16,1.34314575 1.34314575,3.04359188e-16 3,0 Z';
