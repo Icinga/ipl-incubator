@@ -79,7 +79,7 @@ class HorizontalBar extends BaseHtmlElement
         $title = new HtmlElement(
             'text',
             new Attributes([
-                'class'         => 'svg-text',
+                'class'         => 'svg-horizontal-title',
                 'fill'          => 'gray',
                 'dominant-baseline' => 'central',
                 'x'             => $this->outerMarginLeft + $this->textMargin,

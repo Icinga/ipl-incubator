@@ -1,0 +1,78 @@
+
+.svg-text {
+  fill: @gray-dark;
+}
+
+.vertical-bar-graph {
+  height: 20em;
+
+  .bar-0 {
+    fill: #0095bf;
+  }
+  .bar-1 {
+    fill: #4dd9b9;
+  }
+  .bar-2 {
+    fill: #a1f7c9;
+  }
+}
+
+.horizontal-bar-graph {
+  height: 4em;
+
+  .bar-blue {
+    fill: #0095bf;
+  }
+
+  .bar-light-blue {
+    fill: #4dd9b9;
+  }
+
+  .bar-ok {
+    fill: @color-ok;
+  }
+
+  .threshold-warning,
+  .bar-warning {
+    fill: @color-warning;
+    &.round {
+      stroke: @color-warning;
+      fill: transparent;
+    }
+  }
+
+  .threshold-critical,
+  .bar-critical {
+    fill: @color-critical;
+    &.round {
+      stroke: @color-critical;
+      fill: transparent;
+    }
+  }
+
+  .threshold-black {
+    fill: @black;
+    &.round {
+      stroke: @black;
+      fill: transparent;
+    }
+  }
+
+  .svg-horizontal-title {
+    fill: @text-color;
+  }
+
+  .svg-horizontal-label {
+    fill: @text-color;
+  }
+
+  .svg-horizontal-value {
+    fill: @text-color;
+    font-size: 1.1em;
+  }
+
+  .svg-horizontal-max {
+    fill: @text-color-light;
+    font-size: 0.75em;
+  }
+}
