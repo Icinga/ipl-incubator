@@ -213,7 +213,8 @@ class HorizontalBar extends BaseHtmlElement
         }
 
         if ($threshold === $this->data['max']) {
-            $path = sprintf('M0.5,0.5'
+            $path = sprintf(
+                'M0.5,0.5'
                 . 'l1,0 '
                 . 'q4,0 4,4 '
                 . 'l0,%s '
