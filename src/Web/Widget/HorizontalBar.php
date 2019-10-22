@@ -87,7 +87,7 @@ class HorizontalBar extends BaseHtmlElement
             ]),
             new HtmlElement(
                 'tspan',
-                [],
+                new Attributes(['class' => 'svg-horizontal-label']),
                 $this->title
             )
         );
@@ -292,7 +292,7 @@ class HorizontalBar extends BaseHtmlElement
         if (isset($this->data['uom'])) {
             $unit = new HtmlElement(
                 'tspan',
-                [],
+                new Attributes(['class' => 'svg-horizontal-uom']),
                 sprintf(' %s', $this->data['uom'])
             );
         }
@@ -301,7 +301,7 @@ class HorizontalBar extends BaseHtmlElement
         if (isset($this->data['max'])) {
             $max = new HtmlElement(
                 'tspan',
-                [],
+                new Attributes(['class' => 'svg-horizontal-max']),
                 sprintf(' / %s', $this->data['max'])
             );
         }
@@ -319,7 +319,7 @@ class HorizontalBar extends BaseHtmlElement
             [
                 new HtmlElement(
                     'tspan',
-                    [],
+                    new Attributes(['class' => 'svg-horizontal-value']),
                     $this->data['value']
                 ),
                 $unit,
