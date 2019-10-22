@@ -7,7 +7,7 @@ use ipl\Html\BaseHtmlElement;
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 
-class BarGraph extends BaseHtmlElement
+class VerticalBarGraph extends BaseHtmlElement
 {
     protected $tag = 'svg';
 
