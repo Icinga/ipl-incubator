@@ -4,7 +4,6 @@ namespace ipl\Web\Widget;
 
 use ipl\Html\Attributes;
 use ipl\Html\BaseHtmlElement;
-use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 
 class VerticalBarGraph extends BaseHtmlElement
@@ -13,23 +12,76 @@ class VerticalBarGraph extends BaseHtmlElement
 
     protected $defaultAttributes = ['class' => 'vertical-bar-graph'];
 
+    /**
+     * Each set of data
+     *
+     * @var array
+     */
     protected $dataSets = [];
 
-    protected $graphData = [];
-
+    /**
+     * Amount of lines to be displayes in the grid
+     *
+     * @var int
+     */
     protected $amountLines = 4;
 
+    /**
+     * Width of the used bars
+     *
+     * @var int
+     */
+    protected $barWidth = 20;
+
+    /**
+     * Calculated data required for drawing the graph
+     * Keys: min, max, difference, jump, start
+     *
+     * @var array
+     */
+    protected $graphData = [];
+
+    /**
+     * Array of the legends' labels
+     *
+     * @var array
+     */
+    protected $legendLabels;
+
+    /**
+     * Margin to the left of the svg
+     *
+     * @var int
+     */
     protected $outerMarginLeft = 30;
 
+    /**
+     * Margin to the top of the svg
+     *
+     * @var int
+     */
     protected $outerMarginTop = 15;
 
-    protected $graphHeight = 115;
-
+    /**
+     * Total width of the svg which is calculated during drawing
+     *
+     * @var
+     */
     protected $totalWidth;
 
-    protected $textMargin = 5;
+    /**
+     * Total height of the graph without margins
+     *
+     * @var int
+     */
+    protected $graphHeight = 115;
 
-    protected $barWidth = 20;
+    /**
+     * Margin between text and graphical objects
+     *
+     * @var int
+     */
+    protected $textMargin = 5;
 
     /**
      * BarGraph constructor.
@@ -60,6 +112,20 @@ class VerticalBarGraph extends BaseHtmlElement
     }
 
     /**
+     * Set legend to be displayed next to this graph
+     *
+     * @param   array   $legend
+     *
+     * @return  $this
+     */
+    public function setLegend($legend)
+    {
+        $this->legendLabels = $legend;
+
+        return $this;
+    }
+
+    /**
      * Draws the graph after all data has been added.
      *
      * @return $this|array   Generated graph ready to be rendered
@@ -72,13 +138,19 @@ class VerticalBarGraph extends BaseHtmlElement
 
         $this->calcGraphData();
 
-        $this->addAttributes(['viewbox' => '0 0 ' . $this->totalWidth . ' 150']);
 
         $graph = [$this->drawGrid()];
         foreach ($this->dataSets as $key => $dataSet) {
             $graph[] = $this->drawDataSet($key, $dataSet);
         }
         $graph[] = $this->drawBaseline();
+
+        if (isset($this->legendLabels)) {
+            $graph[] = $this->drawLegend();
+            $this->totalWidth += 100;
+        }
+
+        $this->addAttributes(['viewbox' => '0 0 ' . $this->totalWidth . ' 150']);
 
         $this->setContent($graph);
 
@@ -199,6 +271,8 @@ class VerticalBarGraph extends BaseHtmlElement
     }
 
     /**
+     * Draws a set of data
+     *
      * @param   int     $pos
      * @param   array   $dataSet
      *
@@ -213,7 +287,7 @@ class VerticalBarGraph extends BaseHtmlElement
             new Attributes([
                 'class' => 'data-set',
                 'transform' => 'translate(' . ($width * $pos) . ',0)'
-                ]),
+            ]),
             [
                 $this->drawBars($dataSet['data']),
                 new HtmlElement(
@@ -239,6 +313,8 @@ class VerticalBarGraph extends BaseHtmlElement
     }
 
     /**
+     * Draws the bars for a data set
+     *
      * @param   array   $data
      *
      * @return  array   $bars   All bars for the data set
@@ -271,7 +347,7 @@ class VerticalBarGraph extends BaseHtmlElement
                 + ($this->getBarWidth() * $order)
                 + ($order + 1) * $this->getBarMargins($data);
 
-            $bars[] =new HtmlElement(
+            $bars[] = new HtmlElement(
                 'g',
                 new Attributes([
                     'transform' => sprintf(
@@ -283,9 +359,9 @@ class VerticalBarGraph extends BaseHtmlElement
                 [
                     new HtmlElement('path',
                         new Attributes([
-                        'd' => $this->getPathString($height, $this->getBarWidth()),
-                        'class' => 'bar-' . $order,
-                        'fill' => sprintf('#%06X', mt_rand(0, 0xFFFFFF))
+                            'd'     => $this->getPathString($height, $this->getBarWidth()),
+                            'class' => 'bar-' . $order,
+                            'fill'  => sprintf('#%06X', mt_rand(0, 0xFFFFFF))
                         ])
                     ),
                     $graphText
@@ -294,6 +370,39 @@ class VerticalBarGraph extends BaseHtmlElement
         }
 
         return $bars;
+    }
+
+    /**
+     * Draws the legend for this graph (if set)
+     *
+     * @return HtmlElement
+     */
+    protected function drawLegend()
+    {
+        $legend = [];
+        foreach ($this->legendLabels as $key => $legendItem) {
+            $legend[] = new HtmlElement(
+                'g',
+                new Attributes([
+                    'class' => 'svg-legend-item',
+                    'transform' => 'translate(0,' . ($key * (3 * $this->textMargin)) . ')'
+                ]), [
+                new HtmlElement(
+                    'circle',
+                    new Attributes([
+                        'class' => 'svg-legend-ball svg-legend-ball-' . $key, 'cx' => 0, 'cy' => -3, 'r' => 3
+                    ])),
+                new HtmlElement(
+                    'text',
+                    new Attributes([
+                        'class' => 'svg-legend-text svg-text',
+                        'transform' => 'translate(' . ($this->textMargin) . ',0)'
+                    ]),
+                $legendItem)
+            ]);
+        }
+
+        return new HtmlElement('g', new Attributes(['class' => 'svg-legend-item', 'transform' => 'translate(' . ($this->totalWidth + $this->textMargin * 2). ',' . ($this->outerMarginTop + $this->textMargin) . ')']), $legend);
     }
 
     /**
