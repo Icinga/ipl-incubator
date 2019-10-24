@@ -10,6 +10,8 @@ class HorizontalBar extends BaseHtmlElement
 {
     const BAR_WIDTH = 10;
 
+    const OUTER_MARGIN_TOP = 20;
+
     protected $tag = 'svg';
 
     protected $defaultAttributes = ['class' => 'horizontal-bar'];
@@ -56,7 +58,7 @@ class HorizontalBar extends BaseHtmlElement
      *
      * @var int
      */
-    protected $outerMarginTop = 8;
+    protected $outerMarginTop = self::OUTER_MARGIN_TOP;
 
     /**
      * Total width of the svg which is calculated during drawing
@@ -430,15 +432,12 @@ class HorizontalBar extends BaseHtmlElement
             );
         }
 
-
         $values = new HtmlElement(
             'text',
             new Attributes([
                 'class'         => 'svg-text',
-                'fill'          => 'gray',
-                'dominant-baseline' => 'central',
                 'x'             => $this->graphData['bar-x'] + $this->graphData['bar-width'] + $this->textMargin,
-                'y'             => $this->outerMarginTop + $this->barWidth / 2,
+                'y'             => $this->outerMarginTop + $this->barWidth / 2 + 4,
             ]),
             [
                 new HtmlElement(

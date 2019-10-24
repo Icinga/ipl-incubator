@@ -91,7 +91,7 @@ class HorizontalBarGraph extends BaseHtmlElement
         $this->addAttributes(['viewbox' => sprintf(
             '0 0 %s %s',
             500,
-            count($this->bars) * (2 * 8 + 10)
+            count($this->bars) * (2 * HorizontalBar::OUTER_MARGIN_TOP + HorizontalBar::BAR_WIDTH)
         )]);
 
         $this->setContent($graph);
