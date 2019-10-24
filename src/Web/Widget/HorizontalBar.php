@@ -8,9 +8,11 @@ use ipl\Html\HtmlElement;
 
 class HorizontalBar extends BaseHtmlElement
 {
+    const BAR_WIDTH = 10;
+
     protected $tag = 'svg';
 
-    protected $defaultAttributes = ['class' => 'horizontal-bar-graph'];
+    protected $defaultAttributes = ['class' => 'horizontal-bar'];
 
     /**
      * Perfdata in the form of an array
@@ -40,14 +42,14 @@ class HorizontalBar extends BaseHtmlElement
      *
      * @var int
      */
-    protected $barWidth = 10;
+    protected $barWidth = self::BAR_WIDTH;
 
     /**
      * Margin to the left of the svg
      *
      * @var int
      */
-    protected $outerMarginLeft = 30;
+    protected $outerMarginLeft = 15;
 
     /**
      * Margin to the top of the svg

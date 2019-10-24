@@ -1,4 +1,9 @@
 
+.svg-title {
+  fill: @text-color;
+  font-weight: bold;
+}
+
 .svg-text {
   fill: @gray-dark;
 }
@@ -14,16 +19,27 @@
   .bar-1 {
     fill: #4dd9b9;
   }
-
   .svg-legend-ball-2,
   .bar-2 {
     fill: #a1f7c9;
   }
+  .svg-legend-ball-3,
+  .bar-3 {
+    fill: #888;
+  }
+  .svg-legend-ball-4,
+  .bar-4 {
+    fill: #333;
+  }
 }
 
-.horizontal-bar-graph {
-  height: 4em;
+.horizontal-bar-graph,
+.horizontal-bar {
+  width: 50em;
+  display: block;
+}
 
+.horizontal-bar {
   .bar-neutral {
     fill: #0095bf;
   }
