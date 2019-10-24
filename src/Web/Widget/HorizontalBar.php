@@ -71,6 +71,13 @@ class HorizontalBar extends BaseHtmlElement
     protected $textMargin = 5;
 
     /**
+     * Whether over or under the threshold
+     *
+     * @var bool
+     */
+    protected $inverted = false;
+
+    /**
      * HorizontalBar constructor.
      *
      * @param string            $title
@@ -113,8 +120,12 @@ class HorizontalBar extends BaseHtmlElement
         $this->data['warn'] = $warn;
         $this->data['crit'] = $crit;
 
-        $this->data['min'] = $min ?: min($value, 0);
-        $this->data['max'] = $max ?: max($value, $warn, $crit);
+        if ($crit !== null && $warn > $crit) {
+            $this->setInverted(true);
+        }
+
+        $this->data['min'] = $min;
+        $this->data['max'] = $max;
 
         $this->calculateGraphData();
     }
@@ -126,7 +137,10 @@ class HorizontalBar extends BaseHtmlElement
         $this->graphData['bar-x'] = $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5;
         $this->graphData['bar-width'] = $this->totalWidth / 2;
 
-        $this->graphData['zero'] = $this->getRelativeValue(0 - $this->data['min'], $this->data['max'] - $this->data['min'], $this->graphData['bar-width']);
+        $this->graphData['min'] = $this->data['min'] ?: min($this->data['value'], 0);
+        $this->graphData['max'] = $this->data['max'] ?: max($this->data['value'], $this->data['warn'], $this->data['crit']);;
+
+        $this->graphData['zero'] = $this->getRelativeValue(0 - $this->graphData['min'], $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
     }
 
     /**
@@ -210,12 +224,12 @@ class HorizontalBar extends BaseHtmlElement
             $crit = $this->drawThreshold($crit, 'critical');
         }
 
-        $value = $this->getRelativeValue($this->data['value'], $this->data['max'] - $this->data['min'], $this->graphData['bar-width']);
+        $value = $this->getRelativeValue($this->data['value'], $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
 
         $start = min($this->graphData['zero'], $value);
         $end = max($this->graphData['zero'], $value);
 
-        if ($this->data['min'] < 0) {
+        if ($this->graphData['min'] < 0) {
             if ($this->data['value'] > 0) {
                 $path = sprintf(
                     'M0,0'
@@ -297,11 +311,11 @@ class HorizontalBar extends BaseHtmlElement
     protected function drawThreshold($threshold, $kind)
     {
         $col = $kind;
-        if ($this->getBarFill() === $kind) {
+        if ($this->getBarFill() === $kind && ! $this->isInverted()) {
             $col = 'black';
         }
 
-        if ($threshold === $this->data['max']) {
+        if ($threshold === $this->graphData['max']) {
             $path = sprintf(
                 'M0.5,0.5'
                 . 'l1,0 '
@@ -326,7 +340,7 @@ class HorizontalBar extends BaseHtmlElement
             );
         }
 
-        $threshold = $this->getRelativeValue($threshold, $this->data['max'] - $this->data['min'], $this->graphData['bar-width']);
+        $threshold = $this->getRelativeValue($threshold, $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
 
         return new HtmlElement(
             'rect',
@@ -368,12 +382,24 @@ class HorizontalBar extends BaseHtmlElement
                 return 'light-neutral';
             }
             return 'neutral';
-        } elseif ($crit !== null && $value > $crit) {
-            return 'critical';
-        } elseif ($warn !== null && $value > $warn) {
-            return 'warning';
+        }
+
+        if (! $this->isInverted()) {
+            if ($crit !== null && $value > $crit) {
+                return 'critical';
+            } elseif ($warn !== null && $value > $warn) {
+                return 'warning';
+            } else {
+                return 'ok';
+            }
         } else {
-            return 'ok';
+            if ($crit !== null && $value < $crit) {
+                return 'critical';
+            } elseif ($warn !== null && $value < $warn) {
+                return 'warning';
+            } else {
+                return 'ok';
+            }
         }
     }
 
@@ -424,5 +450,29 @@ class HorizontalBar extends BaseHtmlElement
         );
 
         return $values;
+    }
+
+    /**
+     * Get this $inverted
+     *
+     * @return bool
+     */
+    public function isInverted()
+    {
+        return $this->inverted;
+    }
+
+    /**
+     * Set this $inverted
+     *
+     * @param bool $inverted
+     *
+     * @return $this
+     */
+    public function setInverted($inverted)
+    {
+        $this->inverted = $inverted;
+
+        return $this;
     }
 }
