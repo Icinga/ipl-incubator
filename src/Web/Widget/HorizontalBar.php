@@ -10,7 +10,7 @@ class HorizontalBar extends BaseHtmlElement
 {
     const BAR_WIDTH = 10;
 
-    const OUTER_MARGIN_TOP = 20;
+    const OUTER_MARGIN_TOP = 8;
 
     protected $tag = 'svg';
 
