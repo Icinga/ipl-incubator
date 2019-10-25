@@ -31,7 +31,7 @@ class VerticalBarGraph extends BaseHtmlElement
      *
      * @var int
      */
-    protected $barWidth = 20;
+    protected $barWidth = 18;
 
     /**
      * Calculated data required for drawing the graph

@@ -55,21 +55,27 @@ class HorizontalBarGraph extends BaseHtmlElement
 
     public function draw()
     {
-        $graph[] = new HtmlElement(
-            'text',
-            new Attributes(['transform' => 'translate(0,' . HorizontalBar::BAR_WIDTH . ')']),
-            new HtmlElement(
-                'tspan',
-                new Attributes(['class' => 'svg-title']),
-                $this->title
-            )
-        );
+        if (isset($this->title)) {
+            $graph[] = new HtmlElement(
+                'text',
+                new Attributes(['transform' => 'translate(0,' . HorizontalBar::BAR_WIDTH . ')']),
+                new HtmlElement(
+                    'tspan',
+                    new Attributes(['class' => 'svg-title']),
+                    $this->title
+                )
+            );
+        }
 
         $bars = [];
         foreach ($this->bars as $key => $dataSet) {
+            $position = $key;
+            if (isset($this->title)) {
+                $position += 1;
+            }
             $bars[] = new HtmlElement(
                 'g',
-                new Attributes(['transform' => 'translate(0,' . ($key + 1) * HorizontalBar::BAR_WIDTH * 2 . ')']),
+                new Attributes(['transform' => 'translate(0,' . $position * HorizontalBar::BAR_WIDTH * 2 . ')']),
                 [
                     (
                         new HorizontalBar(
@@ -88,11 +94,15 @@ class HorizontalBarGraph extends BaseHtmlElement
 
         $graph[] = $bars;
 
+        $amountBars = count($this->bars);
+        if (isset($this->title)) {
+            $amountBars += 1;
+        }
         $this->addAttributes(['viewbox' => sprintf(
             '0 0 %s %s',
             500,
-            count($this->bars) * (2 * HorizontalBar::OUTER_MARGIN_TOP + HorizontalBar::BAR_WIDTH)
-        )]);
+            $amountBars * (2 * HorizontalBar::OUTER_MARGIN_TOP + HorizontalBar::BAR_WIDTH))
+        ]);
 
         $this->setContent($graph);
 
