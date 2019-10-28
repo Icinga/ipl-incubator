@@ -92,8 +92,9 @@ class HorizontalBar extends BaseHtmlElement
      * @param int|float         $crit
      * @param int|float         $min
      * @param int|float         $max
+     * @param array             $forDisplay     Array with keys: 'value', 'uom', 'max'
      */
-    public function __construct($title, $value, Attributes $attributes = null, $uom = null, $warn = null, $crit = null, $min = null, $max = null)
+    public function __construct($title, $value, Attributes $attributes = null, $uom = null, $warn = null, $crit = null, $min = null, $max = null, $forDisplay = null)
     {
         $this->addAttributes($attributes);
         $this->addAttributes(['viewbox' => sprintf(
@@ -104,6 +105,7 @@ class HorizontalBar extends BaseHtmlElement
 
         $this->title = $title;
         $this->setData($value, $uom, $warn, $crit, $min, $max);
+        $this->setToDisplay($forDisplay);
     }
 
     /**
@@ -132,6 +134,14 @@ class HorizontalBar extends BaseHtmlElement
         $this->data['max'] = $max;
 
         $this->calculateGraphData();
+    }
+
+    protected function setToDisplay($forDisplay)
+    {
+        $this->graphData['displayValue'] = isset($forDisplay['value']) ? $forDisplay['value'] : $this->data['value'];
+        $this->graphData['displyMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
+        $this->graphData['displayUom'] = isset($forDisplay['uom']) ? $forDisplay['uom'] : $this->data['uom'];
+
     }
 
     /**
@@ -415,20 +425,20 @@ class HorizontalBar extends BaseHtmlElement
         //todo: change font values to match mockups
 
         $unit = [];
-        if (isset($this->data['uom'])) {
+        if (isset($this->graphData['displayUom'])) {
             $unit = new HtmlElement(
                 'tspan',
                 new Attributes(['class' => 'svg-horizontal-uom']),
-                sprintf(' %s', $this->data['uom'])
+                sprintf(' %s', $this->graphData['displayUom'])
             );
         }
 
         $max = [];
-        if (isset($this->data['max'])) {
+        if (isset($this->graphData['displyMax'])) {
             $max = new HtmlElement(
                 'tspan',
                 new Attributes(['class' => 'svg-horizontal-max']),
-                sprintf(' / %s', $this->data['max'])
+                sprintf(' / %s', $this->graphData['displyMax'])
             );
         }
 
@@ -443,7 +453,7 @@ class HorizontalBar extends BaseHtmlElement
                 new HtmlElement(
                     'tspan',
                     new Attributes(['class' => 'svg-horizontal-value']),
-                    $this->data['value']
+                    $this->graphData['displayValue']
                 ),
                 $unit,
                 $max

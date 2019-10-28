@@ -34,17 +34,19 @@ class HorizontalBarGraph extends BaseHtmlElement
      * @param int|float         $crit
      * @param int|float         $min
      * @param int|float         $max
+     * @param array             $forDisplay     Array with keys: 'value', 'uom', 'max'
      *
      * @return $this
      */
-    public function addDataSet($title, $value, $uom = null, $warn = null, $crit = null, $min = null, $max = null)
+    public function addDataSet($title, $value, $uom = null, $warn = null, $crit = null, $min = null, $max = null, $forDisplay = null)
     {
         $this->bars[] = [
             'title' => $title,
             'value' => $value,
             'uom' => $uom,
             'warn' => $warn,
-            'crit' => $crit
+            'crit' => $crit,
+            'forDisplay' => $forDisplay
         ];
 
         $this->normalisedMax = max($this->normalisedMax, $value, $warn, $crit, $max);
@@ -86,7 +88,8 @@ class HorizontalBarGraph extends BaseHtmlElement
                             $dataSet['warn'],
                             $dataSet['crit'],
                             $this->normalisedMin,
-                            $this->normalisedMax
+                            $this->normalisedMax,
+                            $dataSet['forDisplay']
                         )
                     )->setAttribute('viewbox', null)->draw()
                 ]);
