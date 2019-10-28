@@ -104,8 +104,7 @@ class HorizontalBar extends BaseHtmlElement
         )]);
 
         $this->title = $title;
-        $this->setData($value, $uom, $warn, $crit, $min, $max);
-        $this->setToDisplay($forDisplay);
+        $this->setData($value, $uom, $warn, $crit, $min, $max, $forDisplay);
     }
 
     /**
@@ -117,8 +116,9 @@ class HorizontalBar extends BaseHtmlElement
      * @param int|float         $crit
      * @param int|float         $min
      * @param int|float         $max
+     * @param array             $forDisplay     Array with keys: 'value', 'uom', 'max'
      */
-    public function setData($value, $uom = null, $warn = null, $crit = null, $min = null, $max = null)
+    public function setData($value, $uom = null, $warn = null, $crit = null, $min = null, $max = null, $forDisplay = null)
     {
         $this->data['value'] = $value;
         $this->data['uom'] = $uom;
@@ -133,13 +133,14 @@ class HorizontalBar extends BaseHtmlElement
         $this->data['min'] = $min;
         $this->data['max'] = $max;
 
+        $this->setToDisplay($forDisplay);
         $this->calculateGraphData();
     }
 
     protected function setToDisplay($forDisplay)
     {
         $this->graphData['displayValue'] = isset($forDisplay['value']) ? $forDisplay['value'] : $this->data['value'];
-        $this->graphData['displyMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
+        $this->graphData['displayMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
         $this->graphData['displayUom'] = isset($forDisplay['uom']) ? $forDisplay['uom'] : $this->data['uom'];
 
     }
@@ -434,11 +435,11 @@ class HorizontalBar extends BaseHtmlElement
         }
 
         $max = [];
-        if (isset($this->graphData['displyMax'])) {
+        if (isset($this->graphData['displayMax']) && $this->graphData['displayMax'] !== '') {
             $max = new HtmlElement(
                 'tspan',
                 new Attributes(['class' => 'svg-horizontal-max']),
-                sprintf(' / %s', $this->graphData['displyMax'])
+                sprintf(' / %s', $this->graphData['displayMax'])
             );
         }
 
