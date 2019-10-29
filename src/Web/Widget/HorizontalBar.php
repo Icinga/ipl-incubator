@@ -10,7 +10,7 @@ class HorizontalBar extends BaseHtmlElement
 {
     const BAR_WIDTH = 10;
 
-    const OUTER_MARGIN_TOP = 8;
+    const OUTER_MARGIN_TOP = 0;
 
     protected $tag = 'svg';
 
@@ -201,7 +201,6 @@ class HorizontalBar extends BaseHtmlElement
     /**
      * @return array
      */
-
     protected function drawBar()
     {
         $graph = [
