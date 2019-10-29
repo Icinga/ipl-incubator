@@ -51,7 +51,7 @@ class HorizontalBar extends BaseHtmlElement
      *
      * @var int
      */
-    protected $outerMarginLeft = 15;
+    protected $outerMarginLeft = 0;
 
     /**
      * Margin to the top of the svg
