@@ -185,7 +185,7 @@ class HorizontalBar extends BaseHtmlElement
                 'class'         => 'svg-horizontal-title',
                 'fill'          => 'gray',
                 'dominant-baseline' => 'central',
-                'x'             => $this->outerMarginLeft + $this->textMargin,
+                'x'             => $this->outerMarginLeft ? $this->outerMarginTop + $this->textMargin : 0,
                 'y'             => $this->outerMarginTop + $this->barWidth / 2,
             ]),
             new HtmlElement(
@@ -201,6 +201,7 @@ class HorizontalBar extends BaseHtmlElement
     /**
      * @return array
      */
+
     protected function drawBar()
     {
         $graph = [
