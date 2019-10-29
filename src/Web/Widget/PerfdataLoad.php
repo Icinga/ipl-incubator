@@ -24,9 +24,9 @@ class PerfdataLoad extends BaseHtmlElement
             $graph->addDataSet(
                 $dataset->toArray()['label'],
                 $dataset->toArray()['value'],
-                $dataset->getUnit(),
-                (float)$dataset->getWarningThreshold()->getRaw(),
-                (float)$dataset->getCriticalThreshold()->getRaw()
+                null,
+                (float)$dataset->getWarningThreshold()->getMax(),
+                (float)$dataset->getCriticalThreshold()->getMax()
             );
         }
         $this->setContent($graph->draw());

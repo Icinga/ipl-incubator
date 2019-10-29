@@ -2,7 +2,6 @@
 
 namespace ipl\Web\Widget;
 
-use Icinga\Util\Format;
 use ipl\Html\BaseHtmlElement;
 
 class PerfdataPing extends BaseHtmlElement
@@ -36,14 +35,14 @@ class PerfdataPing extends BaseHtmlElement
                     $dataset->getLabel(),
                     $dataset->getValue(),
                     null,
-                    $dataset->getUnit(),
+                    null,
                     (float)$dataset->getWarningThreshold()->getMax(),
                     (float)$dataset->getCriticalThreshold()->getMax(),
                     null,
                     null,
                     [
-                        'value' => $dataset->toArray()['value'],
-                        'uom' => '',
+                        'value' => $this->splitValue($dataset->toArray()['value'])[0],
+                        'uom' => $this->splitValue($dataset->toArray()['value'])[1],
                         'max' => $displayMax
                     ]
                 ))->draw();
@@ -52,7 +51,7 @@ class PerfdataPing extends BaseHtmlElement
                     $dataset->getLabel(),
                     $dataset->getValue(),
                     null,
-                    $dataset->getUnit(),
+                    null,
                     (float)$dataset->getWarningThreshold()->getMax(),
                     (float)$dataset->getCriticalThreshold()->getMax(),
                     null,

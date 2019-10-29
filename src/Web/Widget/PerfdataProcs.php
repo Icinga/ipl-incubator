@@ -25,9 +25,9 @@ class PerfdataProcs extends BaseHtmlElement
                 $dataset->getLabel(),
                 $dataset->toArray()['value'],
                 null,
-                $dataset->getUnit(),
-                (float)$dataset->getWarningThreshold()->getRaw(),
-                (float)$dataset->getCriticalThreshold()->getRaw()
+                null,
+                (float)$dataset->getWarningThreshold()->getMax(),
+                (float)$dataset->getCriticalThreshold()->getMax()
             ))->draw();
         }
         $this->setContent($graph);

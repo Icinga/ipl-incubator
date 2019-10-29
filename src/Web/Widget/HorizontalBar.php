@@ -142,7 +142,6 @@ class HorizontalBar extends BaseHtmlElement
         $this->graphData['displayValue'] = isset($forDisplay['value']) ? $forDisplay['value'] : $this->data['value'];
         $this->graphData['displayMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
         $this->graphData['displayUom'] = isset($forDisplay['uom']) ? $forDisplay['uom'] : $this->data['uom'];
-
     }
 
     /**

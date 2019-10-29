@@ -4,7 +4,7 @@ namespace ipl\Web\Widget;
 
 use ipl\Html\BaseHtmlElement;
 
-class PerfdataDisk extends BaseHtmlElement
+class PerfdataSwap extends BaseHtmlElement
 {
     protected $tag = 'div';
 
@@ -19,7 +19,7 @@ class PerfdataDisk extends BaseHtmlElement
 
     public function draw()
     {
-        $graph = new HorizontalBarGraph(null);
+        $graph = [];
         foreach ($this->perfdata as $dataset) {
             $potMax = [
                 $dataset->toArray()['value'] => $dataset->getValue(),
@@ -28,9 +28,10 @@ class PerfdataDisk extends BaseHtmlElement
             ];
             $displayMax = array_search(max($potMax), $potMax);
 
-            $graph->addDataSet(
+            $graph[] = (new HorizontalBar(
                 $dataset->getLabel(),
                 $dataset->getValue(),
+                null,
                 null,
                 (float)$dataset->getWarningThreshold()->getMax(),
                 (float)$dataset->getCriticalThreshold()->getMax(),
@@ -41,9 +42,9 @@ class PerfdataDisk extends BaseHtmlElement
                     'uom' => $this->splitValue($dataset->toArray()['value'])[1],
                     'max' => $displayMax
                 ]
-            );
+            ))->draw();
         }
-        $this->setContent($graph->draw());
+        $this->setContent($graph);
 
         return $this;
     }
