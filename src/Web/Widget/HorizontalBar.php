@@ -120,34 +120,25 @@ class HorizontalBar extends BaseHtmlElement
      */
     public function setData($value, $uom = null, $warn = null, $crit = null, $min = null, $max = null, $forDisplay = null)
     {
-        $this->data['value'] = $value;
-        $this->data['uom'] = $uom;
-
-        $this->data['warn'] = $warn;
-        $this->data['crit'] = $crit;
-
-        if ($crit !== null && $warn > $crit) {
-            $this->setInverted(true);
-        }
-
-        $this->data['min'] = $min;
-        $this->data['max'] = $max;
-
-        $this->setToDisplay($forDisplay);
-        $this->calculateGraphData();
-    }
-
-    protected function setToDisplay($forDisplay)
-    {
-        $this->graphData['displayValue'] = isset($forDisplay['value']) ? $forDisplay['value'] : $this->data['value'];
-        $this->graphData['displayMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
-        $this->graphData['displayUom'] = isset($forDisplay['uom']) ? $forDisplay['uom'] : $this->data['uom'];
+        $this
+            ->setValue($value)
+            ->setUom($uom)
+            ->setWarn($warn)
+            ->setCrit($crit)
+            ->setMin($min)
+            ->setMax($max)
+            ->setForDisplay($forDisplay);
     }
 
     /**
      * Calculates data needed for drawing
      */
     protected function calculateGraphData() {
+
+        if ($this->data['crit'] !== null && $this->data['warn'] > $this->data['crit']) {
+            $this->setInverted(true);
+        }
+
         $this->graphData['bar-x'] = $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5;
         $this->graphData['bar-width'] = $this->totalWidth / 2;
 
@@ -164,6 +155,8 @@ class HorizontalBar extends BaseHtmlElement
      */
     public function draw()
     {
+        $this->calculateGraphData();
+
         $graph = [];
 
         $graph[] = $this->drawTitle();
@@ -483,6 +476,57 @@ class HorizontalBar extends BaseHtmlElement
     public function setInverted($inverted)
     {
         $this->inverted = $inverted;
+
+        return $this;
+    }
+
+    public function setValue($value)
+    {
+        $this->data['value'] = $value;
+
+        return $this;
+    }
+
+    public function setUom($uom)
+    {
+        $this->data['uom'] = $uom;
+
+        return $this;
+    }
+
+    public function setWarn($warn)
+    {
+        $this->data['warn'] = $warn;
+
+        return $this;
+    }
+
+    public function setCrit($crit)
+    {
+        $this->data['crit'] = $crit;
+
+        return $this;
+    }
+
+    public function setMin($min)
+    {
+        $this->data['min'] = $min;
+
+        return $this;
+    }
+
+    public function setMax($max)
+    {
+        $this->data['max'] = $max;
+
+        return $this;
+    }
+
+    public function setForDisplay($forDisplay)
+    {
+        $this->graphData['displayValue'] = isset($forDisplay['value']) ? $forDisplay['value'] : $this->data['value'];
+        $this->graphData['displayMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
+        $this->graphData['displayUom'] = isset($forDisplay['uom']) ? $forDisplay['uom'] : $this->data['uom'];
 
         return $this;
     }

@@ -31,37 +31,26 @@ class PerfdataPing extends BaseHtmlElement
                 ];
                 $displayMax = array_search(max($potMax), $potMax);
 
-                $graph[] = (new HorizontalBar(
-                    $dataset->getLabel(),
-                    $dataset->getValue(),
-                    null,
-                    null,
-                    (float)$dataset->getWarningThreshold()->getMax(),
-                    (float)$dataset->getCriticalThreshold()->getMax(),
-                    null,
-                    null,
-                    [
+                $graph[] = (new HorizontalBar($dataset->getLabel(), $dataset->getValue()))
+                    ->setWarn((float)$dataset->getWarningThreshold()->getMax())
+                    ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
+                    ->setForDisplay([
                         'value' => $this->splitValue($dataset->toArray()['value'])[0],
                         'uom' => $this->splitValue($dataset->toArray()['value'])[1],
                         'max' => $displayMax
-                    ]
-                ))->draw();
+                    ])
+                    ->draw();
             } elseif ($dataset->getLabel() === 'pl') {
-                $graph[] = (new HorizontalBar(
-                    $dataset->getLabel(),
-                    $dataset->getValue(),
-                    null,
-                    null,
-                    (float)$dataset->getWarningThreshold()->getMax(),
-                    (float)$dataset->getCriticalThreshold()->getMax(),
-                    null,
-                    100,
-                    [
+                $graph[] = (new HorizontalBar($dataset->getLabel(), $dataset->getValue()))
+                    ->setWarn((float)$dataset->getWarningThreshold()->getMax())
+                    ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
+                    ->setMax(100)
+                    ->setForDisplay([
                         'value' => $dataset->toArray()['value'],
                         'uom' => '',
                         'max' => '',
-                    ]
-                ))->draw();
+                    ])
+                    ->draw();
             }
         }
         $this->setContent($graph);

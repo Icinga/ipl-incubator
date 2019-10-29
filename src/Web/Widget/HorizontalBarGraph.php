@@ -24,6 +24,7 @@ class HorizontalBarGraph extends BaseHtmlElement
     {
         $this->title = $title;
     }
+
     /**
      * Adds a bar
      *

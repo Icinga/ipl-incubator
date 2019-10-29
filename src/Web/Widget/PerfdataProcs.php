@@ -21,14 +21,10 @@ class PerfdataProcs extends BaseHtmlElement
     {
         $graph = [];
         foreach ($this->perfdata as $dataset) {
-            $graph[] = (new HorizontalBar(
-                $dataset->getLabel(),
-                $dataset->toArray()['value'],
-                null,
-                null,
-                (float)$dataset->getWarningThreshold()->getMax(),
-                (float)$dataset->getCriticalThreshold()->getMax()
-            ))->draw();
+            $graph[] = (new HorizontalBar($dataset->getLabel(), $dataset->toArray()['value']))
+                ->setWarn((float)$dataset->getWarningThreshold()->getMax())
+                ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
+                ->draw();
         }
         $this->setContent($graph);
 

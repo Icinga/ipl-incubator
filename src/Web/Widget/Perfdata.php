@@ -34,36 +34,33 @@ class Perfdata extends BaseHtmlElement
             break;
         default:
             $rows = [];
-            foreach ($perfdata as $dataset) {
-                $setArray = $this->formatDataSet($dataset->toArray());
+            foreach ($perfdata as $dataSet) {
+                $setArray = $this->formatDataSet($dataSet->toArray());
                 if ($this->isEligibleForGraph($setArray))
                 {
                     $potMax = [
-                        $dataset->toArray()['value'] => $dataset->getValue(),
-                        $dataset->toArray()['warn'] => (float)$dataset->getWarningThreshold()->getMax(),
-                        $dataset->toArray()['crit'] => (float)$dataset->getCriticalThreshold()->getMax()
+                        $dataSet->toArray()['value'] => $dataSet->getValue(),
+                        $dataSet->toArray()['warn'] => (float)$dataSet->getWarningThreshold()->getMax(),
+                        $dataSet->toArray()['crit'] => (float)$dataSet->getCriticalThreshold()->getMax()
                     ];
                     $displayMax = array_search(max($potMax), $potMax);
 
                     $rows[] = (new HorizontalBar(
-                        $dataset->getLabel(),
-                        $dataset->getValue(),
-                        null,
-                        null,
-                        (float)$dataset->getWarningThreshold()->getMax(),
-                        (float)$dataset->getCriticalThreshold()->getMax(),
-                        null,
-                        null,
-                        [
-                            'value' => $this->splitValue($dataset->toArray()['value'])[1],
-                            'uom' => $this->splitValue($dataset->toArray()['value'])[2],
+                        $dataSet->getLabel(),
+                        $dataSet->getValue()))
+                        ->setWarn((float)$dataSet->getWarningThreshold()->getMax())
+                        ->setCrit((float)$dataSet->getCriticalThreshold()->getMax())
+                        ->setMin($dataSet->getMinimumValue())
+                        ->setMax($dataSet->getMaximumValue())
+                        ->setForDisplay([
+                            'value' => $this->splitValue($dataSet->toArray()['value'])[1],
+                            'uom' => $this->splitValue($dataSet->toArray()['value'])[2],
                             'max' => $displayMax
-                        ]
-                    ))->draw();
-
+                        ])
+                        ->draw();
                 } else {
                     // todo: format
-                    $rows[] = new HtmlElement('p', null, $dataset->__toString());
+                    $rows[] = new HtmlElement('p', null, $dataSet->__toString());
                 }
             }
 
@@ -72,7 +69,6 @@ class Perfdata extends BaseHtmlElement
             ]));
         }
     }
-
 
     protected function isEligibleForGraph($dataSet)
     {
