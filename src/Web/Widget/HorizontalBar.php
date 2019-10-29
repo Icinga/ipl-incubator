@@ -152,7 +152,7 @@ class HorizontalBar extends BaseHtmlElement
         $this->graphData['bar-width'] = $this->totalWidth / 2;
 
         $this->graphData['min'] = $this->data['min'] ?: min($this->data['value'], 0);
-        $this->graphData['max'] = $this->data['max'] ?: max($this->data['value'], $this->data['warn'], $this->data['crit']);;
+        $this->graphData['max'] = $this->data['max'] ?: max($this->data['value'], $this->data['warn'], $this->data['crit']);
 
         $this->graphData['zero'] = $this->getRelativeValue(0 - $this->graphData['min'], $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
     }
