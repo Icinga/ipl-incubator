@@ -20,7 +20,7 @@ class VerticalBarGraph extends BaseHtmlElement
     protected $dataSets = [];
 
     /**
-     * Amount of lines to be displayes in the grid
+     * Amount of lines to be displayed in the grid
      *
      * @var int
      */
