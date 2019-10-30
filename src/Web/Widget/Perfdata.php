@@ -110,6 +110,10 @@ class Perfdata extends BaseHtmlElement
      */
     protected function calculateVerticalGraph($perfdata)
     {
+        if ($this->count($perfdata) <= 1) {
+            return null;
+        }
+
         $labels = [];
         $values = [];
         foreach ($perfdata as $dataSet) {
