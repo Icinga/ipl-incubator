@@ -20,13 +20,14 @@ class PerfdataHttp extends BaseHtmlElement
         $values = [];
         $labels = [];
         foreach ($perfdata as $key => $dataset) {
+
             if ($dataset->getLabel() === 'size') {
                 $this->size = $dataset->toArray()['value'];
             } elseif (substr($dataset->getLabel(), 0, 5) === 'time_') {
-                $values[] = round($dataset->toArray()['value'], 2);
+                $values[] = round($dataset->getValue() * 1000, 2);
                 $labels[] = substr($dataset->getLabel(), 5);
             } else {
-                $values[] = round($dataset->toArray()['value'], 2);
+                $values[] = round($dataset->getValue() * 1000, 2);
                 $labels[] = $dataset->getLabel();
             }
         }
