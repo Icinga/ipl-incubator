@@ -32,8 +32,8 @@ class PerfdataSwap extends BaseHtmlElement
                 ->setWarn((float)$dataset->getWarningThreshold()->getMax())
                 ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
                 ->setForDisplay(
-                    $this->splitValue($dataset->toArray()['value'])[1],
-                    $this->splitValue($dataset->toArray()['value'])[2],
+                    Perfdata::splitValue($dataset->toArray()['value'])[1],
+                    Perfdata::splitValue($dataset->toArray()['value'])[2],
                     $displayMax
                 )
                 ->draw();
@@ -43,9 +43,4 @@ class PerfdataSwap extends BaseHtmlElement
         return $this;
     }
 
-    protected function splitValue($value)
-    {
-        preg_match('/(\d+\.?\d*)\s?(.*)/', $value, $matches);
-        return $matches;
-    }
 }

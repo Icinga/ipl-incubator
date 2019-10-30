@@ -53,8 +53,8 @@ class Perfdata extends BaseHtmlElement
                         ->setMin($dataSet->getMinimumValue())
                         ->setMax($dataSet->getMaximumValue())
                         ->setForDisplay(
-                            $this->splitValue($dataSet->toArray()['value'])[1],
-                            $this->splitValue($dataSet->toArray()['value'])[2],
+                            Perfdata::splitValue($dataSet->toArray()['value'])[1],
+                            Perfdata::splitValue($dataSet->toArray()['value'])[2],
                             $displayMax
                         )
                         ->draw();
@@ -102,14 +102,14 @@ class Perfdata extends BaseHtmlElement
             }
 
             if ($key !== 'value' && $key !== 'label' && is_string($value)) {
-                $value = (float)$this->splitValue($value)[1];
+                $value = (float)Perfdata::splitValue($value)[1];
             }
         }
 
         return $dataSet;
     }
 
-    protected function splitValue($value)
+    static function splitValue($value)
     {
         preg_match('/(\d+\.?\d*)\s?(.*)/', $value, $matches);
         return $matches;
