@@ -21,12 +21,10 @@ class PerfdataLoad extends BaseHtmlElement
     {
         $graph = new HorizontalBarGraph(null);
         foreach ($this->perfdata as $dataset) {
-            $graph->addDataSet(
-                $dataset->toArray()['label'],
-                $dataset->toArray()['value'],
-                null,
-                (float)$dataset->getWarningThreshold()->getMax(),
-                (float)$dataset->getCriticalThreshold()->getMax()
+            $graph->addBar(
+                (new HorizontalBar($dataset->toArray()['label'], $dataset->toArray()['value']))
+                    ->setWarn((float)$dataset->getWarningThreshold()->getMax())
+                    ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
             );
         }
         $this->setContent($graph->draw());

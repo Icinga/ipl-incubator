@@ -22,7 +22,14 @@ class HorizontalBar extends BaseHtmlElement
      *
      * @var array
      */
-    protected $data;
+    protected $data = [
+        'value'       => null,
+        'uom'         => null,
+        'warn'        => null,
+        'crit'        => null,
+        'min'         => null,
+        'max'         => null
+    ];
 
     /**
      * Title of this bar
@@ -33,7 +40,7 @@ class HorizontalBar extends BaseHtmlElement
 
     /**
      * Calculated data required for drawing the graph
-     * Keys: zero, bar-x, bar-width, value
+     * Keys: zero, bar-x, bar-width, value, displayValue, displayMax, displayUom
      *
      * @var array
      */
@@ -87,14 +94,8 @@ class HorizontalBar extends BaseHtmlElement
      * @param string            $title
      * @param int|float         $value
      * @param Attributes|null   $attributes
-     * @param string            $uom
-     * @param int|float         $warn
-     * @param int|float         $crit
-     * @param int|float         $min
-     * @param int|float         $max
-     * @param array             $forDisplay     Array with keys: 'value', 'uom', 'max'
      */
-    public function __construct($title, $value, Attributes $attributes = null, $uom = null, $warn = null, $crit = null, $min = null, $max = null, $forDisplay = null)
+    public function __construct($title, $value, Attributes $attributes = null)
     {
         $this->addAttributes($attributes);
         $this->addAttributes(['viewbox' => sprintf(
@@ -104,48 +105,7 @@ class HorizontalBar extends BaseHtmlElement
         )]);
 
         $this->title = $title;
-        $this->setData($value, $uom, $warn, $crit, $min, $max, $forDisplay);
-    }
-
-    /**
-     * Set the data of this Bar
-     *
-     * @param int|float         $value
-     * @param string            $uom
-     * @param int|float         $warn
-     * @param int|float         $crit
-     * @param int|float         $min
-     * @param int|float         $max
-     * @param array             $forDisplay     Array with keys: 'value', 'uom', 'max'
-     */
-    public function setData($value, $uom = null, $warn = null, $crit = null, $min = null, $max = null, $forDisplay = null)
-    {
-        $this
-            ->setValue($value)
-            ->setUom($uom)
-            ->setWarn($warn)
-            ->setCrit($crit)
-            ->setMin($min)
-            ->setMax($max)
-            ->setForDisplay($forDisplay);
-    }
-
-    /**
-     * Calculates data needed for drawing
-     */
-    protected function calculateGraphData() {
-
-        if ($this->data['crit'] !== null && $this->data['warn'] > $this->data['crit']) {
-            $this->setInverted(true);
-        }
-
-        $this->graphData['bar-x'] = $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5;
-        $this->graphData['bar-width'] = $this->totalWidth / 2;
-
-        $this->graphData['min'] = $this->data['min'] ?: min($this->data['value'], 0);
-        $this->graphData['max'] = $this->data['max'] ?: max($this->data['value'], $this->data['warn'], $this->data['crit']);
-
-        $this->graphData['zero'] = $this->getRelativeValue(0 - $this->graphData['min'], $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
+        $this->data['value'] = $value;
     }
 
     /**
@@ -166,6 +126,39 @@ class HorizontalBar extends BaseHtmlElement
         $this->setContent($graph);
 
         return $this;
+    }
+
+    /**
+     * Calculates data needed for drawing
+     */
+    protected function calculateGraphData() {
+
+        if ($this->data['crit'] !== null && $this->data['warn'] > $this->data['crit']) {
+            $this->setInverted(true);
+        }
+
+        $this->graphData['bar-x'] = $this->outerMarginLeft + ($this->totalWidth - $this->outerMarginLeft) / 5;
+        $this->graphData['bar-width'] = $this->totalWidth / 2;
+
+        $this->graphData['min'] = $this->data['min'] ?: min($this->data['value'], 0);
+        $this->graphData['max'] = $this->data['max'] ?: max($this->data['value'], $this->data['warn'], $this->data['crit']);
+
+        $this->graphData['zero'] = $this->getRelativeValue(0 - $this->graphData['min'], $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
+
+        if (! isset($this->graphData['displayValue']))
+        {
+            $this->graphData['displayValue'] = $this->data['value'];
+        }
+
+        if (! isset($this->graphData['displayMax']))
+        {
+            $this->graphData['displayMax'] = $this->data['max'];
+        }
+
+        if (! isset($this->graphData['displayUom']))
+        {
+            $this->graphData['displayUom'] = $this->data['uom'];
+        }
     }
 
     /**
@@ -415,8 +408,6 @@ class HorizontalBar extends BaseHtmlElement
      */
     protected function drawValues()
     {
-        //todo: change font values to match mockups
-
         $unit = [];
         if (isset($this->graphData['displayUom'])) {
             $unit = new HtmlElement(
@@ -480,11 +471,9 @@ class HorizontalBar extends BaseHtmlElement
         return $this;
     }
 
-    public function setValue($value)
+    public function getValue()
     {
-        $this->data['value'] = $value;
-
-        return $this;
+        return $this->data['value'];
     }
 
     public function setUom($uom)
@@ -492,6 +481,11 @@ class HorizontalBar extends BaseHtmlElement
         $this->data['uom'] = $uom;
 
         return $this;
+    }
+
+    public function getWarn()
+    {
+        return $this->data['warn'];
     }
 
     public function setWarn($warn)
@@ -508,11 +502,26 @@ class HorizontalBar extends BaseHtmlElement
         return $this;
     }
 
+    public function getCrit()
+    {
+        return $this->data['crit'];
+    }
+
+    public function getMin()
+    {
+        return $this->data['min'];
+    }
+
     public function setMin($min)
     {
         $this->data['min'] = $min;
 
         return $this;
+    }
+
+    public function getMax()
+    {
+        return $this->data['max'];
     }
 
     public function setMax($max)
@@ -522,11 +531,11 @@ class HorizontalBar extends BaseHtmlElement
         return $this;
     }
 
-    public function setForDisplay($forDisplay)
+    public function setForDisplay($value = null, $uom = null, $max = null)
     {
-        $this->graphData['displayValue'] = isset($forDisplay['value']) ? $forDisplay['value'] : $this->data['value'];
-        $this->graphData['displayMax'] = isset($forDisplay['max']) ? $forDisplay['max'] : $this->data['max'];
-        $this->graphData['displayUom'] = isset($forDisplay['uom']) ? $forDisplay['uom'] : $this->data['uom'];
+        $this->graphData['displayValue'] = $value;
+        $this->graphData['displayMax'] = $max;
+        $this->graphData['displayUom'] = $uom;
 
         return $this;
     }

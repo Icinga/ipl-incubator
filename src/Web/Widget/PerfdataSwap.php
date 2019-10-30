@@ -28,21 +28,15 @@ class PerfdataSwap extends BaseHtmlElement
             ];
             $displayMax = array_search(max($potMax), $potMax);
 
-            $graph[] = (new HorizontalBar(
-                $dataset->getLabel(),
-                $dataset->getValue(),
-                null,
-                null,
-                (float)$dataset->getWarningThreshold()->getMax(),
-                (float)$dataset->getCriticalThreshold()->getMax(),
-                null,
-                null,
-                [
-                    'value' => $this->splitValue($dataset->toArray()['value'])[0],
-                    'uom' => $this->splitValue($dataset->toArray()['value'])[1],
-                    'max' => $displayMax
-                ]
-            ))->draw();
+            $graph[] = (new HorizontalBar($dataset->getLabel(), $dataset->getValue()))
+                ->setWarn((float)$dataset->getWarningThreshold()->getMax())
+                ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
+                ->setForDisplay(
+                    $this->splitValue($dataset->toArray()['value'])[1],
+                    $this->splitValue($dataset->toArray()['value'])[2],
+                    $displayMax
+                )
+                ->draw();
         }
         $this->setContent($graph);
 
@@ -51,6 +45,7 @@ class PerfdataSwap extends BaseHtmlElement
 
     protected function splitValue($value)
     {
-        return preg_split('/[ ]/', $value);
+        preg_match('/(\d+\.?\d*)\s?(.*)/', $value, $matches);
+        return $matches;
     }
 }

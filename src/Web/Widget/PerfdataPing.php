@@ -23,7 +23,6 @@ class PerfdataPing extends BaseHtmlElement
         foreach ($this->perfdata as $dataset) {
 
             if ($dataset->getLabel() === 'rta') {
-
                 $potMax = [
                     $dataset->toArray()['value'] => $dataset->getValue(),
                     $dataset->toArray()['warn'] => (float)$dataset->getWarningThreshold()->getMax(),
@@ -34,22 +33,21 @@ class PerfdataPing extends BaseHtmlElement
                 $graph[] = (new HorizontalBar($dataset->getLabel(), $dataset->getValue()))
                     ->setWarn((float)$dataset->getWarningThreshold()->getMax())
                     ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
-                    ->setForDisplay([
-                        'value' => $this->splitValue($dataset->toArray()['value'])[0],
-                        'uom' => $this->splitValue($dataset->toArray()['value'])[1],
-                        'max' => $displayMax
-                    ])
+                    ->setForDisplay(
+                        $this->splitValue($dataset->toArray()['value'])[1],
+                        $this->splitValue($dataset->toArray()['value'])[2],
+                        $displayMax
+                    )
                     ->draw();
             } elseif ($dataset->getLabel() === 'pl') {
                 $graph[] = (new HorizontalBar($dataset->getLabel(), $dataset->getValue()))
                     ->setWarn((float)$dataset->getWarningThreshold()->getMax())
                     ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
                     ->setMax(100)
-                    ->setForDisplay([
-                        'value' => $dataset->toArray()['value'],
-                        'uom' => '',
-                        'max' => '',
-                    ])
+                    ->setForDisplay(
+                        $this->splitValue($dataset->toArray()['value'])[1],
+                        $this->splitValue($dataset->toArray()['value'])[2],
+                        '')
                     ->draw();
             }
         }
@@ -60,6 +58,7 @@ class PerfdataPing extends BaseHtmlElement
 
     protected function splitValue($value)
     {
-        return preg_split('/[ ]/', $value);
+        preg_match('/(\d+\.?\d*)\s?(.*)/', $value, $matches);
+        return $matches;
     }
 }

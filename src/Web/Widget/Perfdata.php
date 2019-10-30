@@ -15,7 +15,7 @@ class Perfdata extends BaseHtmlElement
     public function __construct($perfdata, $command)
     {
 
-//add heading "Performance Data"
+// todo ? add heading "Performance Data"
     switch ($command) {
         case 'load':
             $this->setContent((new PerfdataLoad($perfdata))->draw());
@@ -52,14 +52,14 @@ class Perfdata extends BaseHtmlElement
                         ->setCrit((float)$dataSet->getCriticalThreshold()->getMax())
                         ->setMin($dataSet->getMinimumValue())
                         ->setMax($dataSet->getMaximumValue())
-                        ->setForDisplay([
-                            'value' => $this->splitValue($dataSet->toArray()['value'])[1],
-                            'uom' => $this->splitValue($dataSet->toArray()['value'])[2],
-                            'max' => $displayMax
-                        ])
+                        ->setForDisplay(
+                            $this->splitValue($dataSet->toArray()['value'])[1],
+                            $this->splitValue($dataSet->toArray()['value'])[2],
+                            $displayMax
+                        )
                         ->draw();
                 } else {
-                    // todo: format
+                    // todo ? format
                     $rows[] = new HtmlElement('p', null, $dataSet->__toString());
                 }
             }
@@ -72,6 +72,8 @@ class Perfdata extends BaseHtmlElement
 
     protected function isEligibleForGraph($dataSet)
     {
+        // todo: check if is eligible for vertical graph!!!
+
         if (isset($dataSet['warn']) && $dataSet['warn'] !== null) {
             return true;
         }
@@ -100,7 +102,7 @@ class Perfdata extends BaseHtmlElement
             }
 
             if ($key !== 'value' && $key !== 'label' && is_string($value)) {
-                $value = (float)$this->splitValue($value)[0];
+                $value = (float)$this->splitValue($value)[1];
             }
         }
 
