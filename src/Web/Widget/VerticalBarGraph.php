@@ -138,7 +138,6 @@ class VerticalBarGraph extends BaseHtmlElement
 
         $this->calcGraphData();
 
-
         $graph = [$this->drawGrid()];
         foreach ($this->dataSets as $key => $dataSet) {
             $graph[] = $this->drawDataSet($key, $dataSet);
@@ -177,7 +176,7 @@ class VerticalBarGraph extends BaseHtmlElement
         $this->graphData['start'] = $this->calculateStart($this->graphData);
         $this->graphData['jump'] = $this->calculateJumps($this->graphData);
 
-        $this->totalWidth = $barCounter * $this->getBarWidth() + 100;
+        $this->totalWidth = $barCounter * $this->getBarWidth() + 175;
 
         return $this->graphData;
     }
@@ -456,6 +455,9 @@ class VerticalBarGraph extends BaseHtmlElement
      */
     protected function getRelativeValue($value, $relativeMax, $absoluteMax)
     {
+        if ($relativeMax == 0 || $absoluteMax == 0) {
+            return 0;
+        }
         return ($value / $relativeMax * 100) * $absoluteMax / 100;
     }
 
@@ -503,8 +505,10 @@ class VerticalBarGraph extends BaseHtmlElement
             $value = round($value / 0.5) * 0.5;
         } elseif ($value > 5 && $value <= 10) {
             $value = round($value / 2.5) * 2.5;
-        } elseif ($value > 10) {
+        } elseif ($value > 10 && $value <= 100) {
             $value = round($value / 5) * 5;
+        } elseif ($value > 100) {
+            $value = round($value / 50) * 50;
         }
 
         return $value;

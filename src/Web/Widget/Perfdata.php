@@ -14,8 +14,6 @@ class Perfdata extends BaseHtmlElement
 
     public function __construct($perfdata, $command)
     {
-
-// todo ? add heading "Performance Data"
     switch ($command) {
         case 'load':
             $this->setContent((new PerfdataLoad($perfdata))->draw());
@@ -31,6 +29,9 @@ class Perfdata extends BaseHtmlElement
             break;
         case 'swap':
             $this->setContent((new PerfdataSwap($perfdata))->draw());
+            break;
+        case 'icinga':
+            $this->setContent((new PerfdataIcinga($perfdata))->draw());
             break;
         default:
             $displayedData = [];
