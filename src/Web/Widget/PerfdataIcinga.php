@@ -48,20 +48,17 @@ class PerfdataIcinga extends BaseHtmlElement
         $apiClientsLabels = [];
         foreach ($perfdata as $key => $dataset) {
             $labelRaw = $dataset->getLabel();
-
-            if (preg_match('/num_(services|hosts)_(.*)/', $labelRaw, $numMonitoringObjectsState)) {
-                unset($perfdata[$key]);
-
-                $states = ['up', 'down', 'unreachable', 'ok', 'warning', 'critical', 'unknown', 'pending'];
-                if ($numMonitoringObjectsState[1] === 'services' && ! in_array($numMonitoringObjectsState[2], $states)) {
-                    $numServicesStates[] = $dataset->getValue();
-                    $labelsServicesStates[] = $numMonitoringObjectsState[2];
-                } elseif ($numMonitoringObjectsState[1] === 'hosts' && ! in_array($numMonitoringObjectsState[2], $states)) {
-                    $numHostsStates[] = $dataset->getValue();
+            if (preg_match('/api_num_{0,1}(.*)_(endpoints|clients)/', $labelRaw, $apiEndpointsClients)) {
+                if ($apiEndpointsClients[2] === 'endpoints') {
+                    $apiEndpoints[] = round($dataset->getValue(), 2);
+                    $apiEndpointsLabels[] = $apiEndpointsClients[1] ?: 'total';
+                } elseif ($apiEndpointsClients[2] === 'clients') {
+                    $apiClients[] = round($dataset->getValue(), 2);
+                    $apiClientsLabels[] = $apiEndpointsClients[1];
                 } else {
+                    $this->displayMiscData($dataset);
                     continue;
                 }
-
                 continue;
             }
 
@@ -78,35 +75,6 @@ class PerfdataIcinga extends BaseHtmlElement
                 if (! in_array($apiNumJsonRpc[1] . ' queue', $apiNumLegendItems)) {
                     $apiNumLegendItems[] = $apiNumJsonRpc[1] . ' queue';
                 }
-                unset($perfdata[$key]);
-                continue;
-            }
-
-            if (preg_match('/active_(.*)_checks(.*)/', $labelRaw, $activeChecksTime)) {
-                $num = ['_1min' => 0, '_5min' => 1, '_15min' => 2, '' => 3];
-                if ($activeChecksTime[1] === 'service') {
-                    $activeServicesValues[$num[$activeChecksTime[2]]] = round($dataset->getValue(), 2);
-                } elseif ($activeChecksTime[1] === 'host') {
-                    $activeHostsValues[$num[$activeChecksTime[2]]] = round($dataset->getValue(), 2);
-                } else {
-                    $this->displayMiscData($dataset);
-                    continue;
-                }
-                unset($perfdata[$key]);
-                continue;
-            }
-
-            if (preg_match('/passive_(.*)_checks(.*)/', $labelRaw, $passiveChecksTime)) {
-                $num = ['_1min' => 0, '_5min' => 1, '_15min' => 2, '' => 3];
-                if ($passiveChecksTime[1] === 'service') {
-                    $passiveServicesValues[$num[$passiveChecksTime[2]]] = round($dataset->getValue(), 2);
-                } elseif ($passiveChecksTime[1] === 'host') {
-                    $passiveHostsValues[$num[$passiveChecksTime[2]]] = round($dataset->getValue(), 2);
-                } else {
-                    $this->displayMiscData($dataset);
-                    continue;
-                }
-                unset($perfdata[$key]);
                 continue;
             }
 
@@ -120,7 +88,32 @@ class PerfdataIcinga extends BaseHtmlElement
                     $this->displayMiscData($dataset);
                     continue;
                 }
-                unset($perfdata[$key]);
+                continue;
+            }
+
+            if (preg_match('/active_(.*)_checks(.*)/', $labelRaw, $activeChecksTime)) {
+                $num = ['_1min' => 0, '_5min' => 1, '_15min' => 2, '' => 3];
+                if ($activeChecksTime[1] === 'service') {
+                    $activeServicesValues[$num[$activeChecksTime[2]]] = round($dataset->getValue(), 2);
+                } elseif ($activeChecksTime[1] === 'host') {
+                    $activeHostsValues[$num[$activeChecksTime[2]]] = round($dataset->getValue(), 2);
+                } else {
+                    $this->displayMiscData($dataset);
+                    continue;
+                }
+                continue;
+            }
+
+            if (preg_match('/passive_(.*)_checks(.*)/', $labelRaw, $passiveChecksTime)) {
+                $num = ['_1min' => 0, '_5min' => 1, '_15min' => 2, '' => 3];
+                if ($passiveChecksTime[1] === 'service') {
+                    $passiveServicesValues[$num[$passiveChecksTime[2]]] = round($dataset->getValue(), 2);
+                } elseif ($passiveChecksTime[1] === 'host') {
+                    $passiveHostsValues[$num[$passiveChecksTime[2]]] = round($dataset->getValue(), 2);
+                } else {
+                    $this->displayMiscData($dataset);
+                    continue;
+                }
                 continue;
             }
 
@@ -135,7 +128,19 @@ class PerfdataIcinga extends BaseHtmlElement
                     $this->displayMiscData($dataset);
                     continue;
                 }
-                unset($perfdata[$key]);
+                continue;
+            }
+
+            if (preg_match('/num_(services|hosts)_(.*)/', $labelRaw, $numMonitoringObjectsState)) {
+                $states = ['up', 'down', 'unreachable', 'ok', 'warning', 'critical', 'unknown', 'pending'];
+                if ($numMonitoringObjectsState[1] === 'services' && ! in_array($numMonitoringObjectsState[2], $states)) {
+                    $numServicesStates[] = $dataset->getValue();
+                    $labelsServicesStates[] = $numMonitoringObjectsState[2];
+                } elseif ($numMonitoringObjectsState[1] === 'hosts' && ! in_array($numMonitoringObjectsState[2], $states)) {
+                    $numHostsStates[] = $dataset->getValue();
+                } else {
+                    continue;
+                }
                 continue;
             }
 
@@ -150,28 +155,10 @@ class PerfdataIcinga extends BaseHtmlElement
                     $this->displayMiscData($dataset);
                     continue;
                 }
-
-                unset($perfdata[$key]);
-                continue;
-            }
-
-
-            if (preg_match('/api_num_{0,1}(.*)_(endpoints|clients)/', $labelRaw, $apiEndpointsClients)) {
-                if ($apiEndpointsClients[2] === 'endpoints') {
-                    $apiEndpoints[] = round($dataset->getValue(), 2);
-                    $apiEndpointsLabels[] = $apiEndpointsClients[1] ?: 'total';
-                } elseif ($apiEndpointsClients[2] === 'clients') {
-                    $apiClients[] = round($dataset->getValue(), 2);
-                    $apiClientsLabels[] = $apiEndpointsClients[1];
-                } else {
-                    $this->displayMiscData($dataset);
-                    continue;
-                }
-
-                unset($perfdata[$key]);
                 continue;
             }
         }
+
         $perfdataStr = '';
         foreach ($perfdata as $value) {
             $perfdataStr .= '<br>' . $value->toArray()['label'];
