@@ -158,12 +158,12 @@ class PerfdataIcinga extends BaseHtmlElement
                 continue;
             }
         }
-
-        $perfdataStr = '';
-        foreach ($perfdata as $value) {
-            $perfdataStr .= '<br>' . $value->toArray()['label'];
-        }
-        echo $perfdataStr;
+//  debug stuff!
+//        $perfdataStr = '';
+//        foreach ($perfdata as $value) {
+//            $perfdataStr .= '<br>' . $value->toArray()['label'];
+//        }
+//        echo $perfdataStr;
 
         $graph[] =
             (new VerticalBarGraph('numbers services', $numServicesStates))
