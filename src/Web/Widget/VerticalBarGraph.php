@@ -176,7 +176,7 @@ class VerticalBarGraph extends BaseHtmlElement
         $this->graphData['start'] = $this->calculateStart($this->graphData);
         $this->graphData['jump'] = $this->calculateJumps($this->graphData);
 
-        $this->totalWidth = $barCounter * $this->getBarWidth() + 175;
+        $this->totalWidth = $barCounter * $this->getBarWidth() + (count($this->dataSets) * 75);
 
         return $this->graphData;
     }
@@ -484,6 +484,10 @@ class VerticalBarGraph extends BaseHtmlElement
     protected function calculateJumps($graphData)
     {
         $jump = ($graphData['max'] - $graphData['start']) / $this->getAmountLines();
+
+        if ($jump == 0) {
+            return 0.25;
+        }
 
         while ($this->roundFitting($jump) < (($graphData['max'] - $graphData['start']) / $this->getAmountLines())) {
             $jump = $jump * 1.1;

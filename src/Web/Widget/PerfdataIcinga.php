@@ -17,9 +17,10 @@ class PerfdataIcinga extends BaseHtmlElement
 
     public function __construct($perfdata)
     {
-        // todo if all values in a graph are 0 => set default scale of 1
-
-        $perfdataArray = [];
+        $numServicesStates = [];
+        $labelsServicesStates = [];
+        $numHostsStates = [];
+        $labelsHostsStates = [];
 
         $itemRateValues = [];
         $amountValues = [];
@@ -36,8 +37,33 @@ class PerfdataIcinga extends BaseHtmlElement
 
         $latency = [];
         $executionTime = [];
+
+        $lastMessages = [];
+        $sumBytes = [];
+        $sumMessages = [];
+
+        $apiEndpoints = [];
+        $apiEndpointsLabels = [];
+        $apiClients = [];
+        $apiClientsLabels = [];
         foreach ($perfdata as $key => $dataset) {
             $labelRaw = $dataset->getLabel();
+
+            if (preg_match('/num_(services|hosts)_(.*)/', $labelRaw, $numMonitoringObjectsState)) {
+                unset($perfdata[$key]);
+
+                $states = ['up', 'down', 'unreachable', 'ok', 'warning', 'critical', 'unknown', 'pending'];
+                if ($numMonitoringObjectsState[1] === 'services' && ! in_array($numMonitoringObjectsState[2], $states)) {
+                    $numServicesStates[] = $dataset->getValue();
+                    $labelsServicesStates[] = $numMonitoringObjectsState[2];
+                } elseif ($numMonitoringObjectsState[1] === 'hosts' && ! in_array($numMonitoringObjectsState[2], $states)) {
+                    $numHostsStates[] = $dataset->getValue();
+                } else {
+                    continue;
+                }
+
+                continue;
+            }
 
             if (preg_match('/api_num_json_rpc_(.*)_queue_(item.*)/', $labelRaw, $apiNumJsonRpc)) {
                 if ($apiNumJsonRpc[2] === 'item_rate') {
@@ -45,42 +71,42 @@ class PerfdataIcinga extends BaseHtmlElement
                 } elseif ($apiNumJsonRpc[2] === 'items') {
                     $amountValues[] = round($dataset->getValue(), 2);
                 } else {
-                    // todo maybe make a misc table then? or another dataset?
-                    var_dump($dataset);
+                    $this->displayMiscData($dataset);
                     continue;
                 }
 
                 if (! in_array($apiNumJsonRpc[1] . ' queue', $apiNumLegendItems)) {
                     $apiNumLegendItems[] = $apiNumJsonRpc[1] . ' queue';
                 }
+                unset($perfdata[$key]);
                 continue;
             }
 
-            if (preg_match('/active_(.*)_checks_(.*)/', $labelRaw, $activeChecksTime)) {
-                $num = ['1min' => 0, '5min' => 1, '15min' => 2];
+            if (preg_match('/active_(.*)_checks(.*)/', $labelRaw, $activeChecksTime)) {
+                $num = ['_1min' => 0, '_5min' => 1, '_15min' => 2, '' => 3];
                 if ($activeChecksTime[1] === 'service') {
                     $activeServicesValues[$num[$activeChecksTime[2]]] = round($dataset->getValue(), 2);
                 } elseif ($activeChecksTime[1] === 'host') {
                     $activeHostsValues[$num[$activeChecksTime[2]]] = round($dataset->getValue(), 2);
                 } else {
-                    // todo maybe make a misc table then? or another dataset?
-                    var_dump($dataset);
+                    $this->displayMiscData($dataset);
                     continue;
                 }
+                unset($perfdata[$key]);
                 continue;
             }
 
-            if (preg_match('/passive_(.*)_checks_(.*)/', $labelRaw, $passiveChecksTime)) {
-                $num = ['1min' => 0, '5min' => 1, '15min' => 2];
+            if (preg_match('/passive_(.*)_checks(.*)/', $labelRaw, $passiveChecksTime)) {
+                $num = ['_1min' => 0, '_5min' => 1, '_15min' => 2, '' => 3];
                 if ($passiveChecksTime[1] === 'service') {
                     $passiveServicesValues[$num[$passiveChecksTime[2]]] = round($dataset->getValue(), 2);
                 } elseif ($passiveChecksTime[1] === 'host') {
                     $passiveHostsValues[$num[$passiveChecksTime[2]]] = round($dataset->getValue(), 2);
                 } else {
-                    // todo maybe make a misc table then? or another dataset?
-                    var_dump($dataset);
+                    $this->displayMiscData($dataset);
                     continue;
                 }
+                unset($perfdata[$key]);
                 continue;
             }
 
@@ -91,10 +117,11 @@ class PerfdataIcinga extends BaseHtmlElement
                 } elseif ($idoQuery[1] === 'query_queue' || ($idoQuery[1] === 'queries' && $idoQuery[2] === 'rate')) {
                     $idoQueryQueueValues[] = round($dataset->getValue(), 2);
                 } else {
-                    // todo maybe make a misc table then? or another dataset?
-                    var_dump($dataset);
+                    $this->displayMiscData($dataset);
                     continue;
                 }
+                unset($perfdata[$key]);
+                continue;
             }
 
             if (preg_match('/^(min)_(.*)|(max)_(.*)|(avg)_(.*)/', $labelRaw, $minMaxAvg)) {
@@ -105,35 +132,73 @@ class PerfdataIcinga extends BaseHtmlElement
                 } elseif ($minMaxAvg[2] === 'execution_time') {
                     $executionTime[$minMaxAvg[1]] = $dataset->getValue();
                 } else {
-                    // todo maybe make a misc table then? or another dataset?
-                    var_dump($dataset);
+                    $this->displayMiscData($dataset);
                     continue;
                 }
+                unset($perfdata[$key]);
+                continue;
+            }
+
+            if (preg_match('/(.*)_(sent|received).*/', $labelRaw, $sentReceived)) {
+                if ($sentReceived[1] === 'last_messages') {
+                    $lastMessages[] = round($dataset->getValue(), 2);
+                } elseif ($sentReceived[1] === 'sum_bytes') {
+                    $sumBytes[] = round($dataset->getValue(), 2);
+                } elseif ($sentReceived[1] === 'sum_messages') {
+                    $sumMessages[] = round($dataset->getValue(), 2);
+                } else {
+                    $this->displayMiscData($dataset);
+                    continue;
+                }
+
+                unset($perfdata[$key]);
+                continue;
             }
 
 
-//    $itemRateValues[] = round($dataset->getValue(), 2);
-//    $amountValues[] = round($dataset->getValue(), 2);
-//    $perfdataArray[] = [$dataset->toArray()['label'], $dataset->toArray()['value']];
-        }
-//        $perfdataStr = '';
-//        foreach ($perfdataArray as $value) {
-//            $perfdataStr .= PHP_EOL . $value[0];
-//        }
-//        var_dump($perfdataArray);
-//        echo $perfdataStr;
+            if (preg_match('/api_num_{0,1}(.*)_(endpoints|clients)/', $labelRaw, $apiEndpointsClients)) {
+                if ($apiEndpointsClients[2] === 'endpoints') {
+                    $apiEndpoints[] = round($dataset->getValue(), 2);
+                    $apiEndpointsLabels[] = $apiEndpointsClients[1] ?: 'total';
+                } elseif ($apiEndpointsClients[2] === 'clients') {
+                    $apiClients[] = round($dataset->getValue(), 2);
+                    $apiClientsLabels[] = $apiEndpointsClients[1];
+                } else {
+                    $this->displayMiscData($dataset);
+                    continue;
+                }
 
-        $graph[] = (new VerticalBarGraph('item rates', $itemRateValues))->addDataSet('amount items', $amountValues)->setLegend($apiNumLegendItems)->draw();
+                unset($perfdata[$key]);
+                continue;
+            }
+        }
+        $perfdataStr = '';
+        foreach ($perfdata as $value) {
+            $perfdataStr .= '<br>' . $value->toArray()['label'];
+        }
+        echo $perfdataStr;
+
+        $graph[] =
+            (new VerticalBarGraph('numbers services', $numServicesStates))
+            ->addDataSet('number hosts', $numHostsStates)
+            ->setLegend(array_merge($labelsServicesStates, $labelsHostsStates))
+            ->draw();
+
+        $graph[] =
+            (new VerticalBarGraph('item rates', $itemRateValues))
+                ->addDataSet('amount items', $amountValues)
+                ->setLegend($apiNumLegendItems)->draw();
+
         $graph[] =
             (new VerticalBarGraph('active service checks', $activeServicesValues))
             ->addDataSet('active host checks', $activeHostsValues)
-            ->setLegend(['1 min', '5 min', '15 min'])
+            ->setLegend(['1 min', '5 min', '15 min', 'per second'])
             ->draw();
 
         $graph[] =
             (new VerticalBarGraph('passive service checks', $passiveServicesValues))
             ->addDataSet('passive host checks', $passiveHostsValues)
-            ->setLegend(['1 min', '5 min', '15 min'])
+            ->setLegend(['1 min', '5 min', '15 min', 'per second'])
             ->draw();
 
         $graph[] =
@@ -158,7 +223,29 @@ class PerfdataIcinga extends BaseHtmlElement
             ->setForDisplay(Format::seconds($executionTime['avg']), '', Format::seconds($executionTime['max']))
             ->draw();
 
+        $graph[] =
+            (new VerticalBarGraph('last messages', $lastMessages))
+                ->addDataSet('sum bytes', $sumBytes)
+                ->addDataSet('sum messages', $sumMessages)
+                ->setLegend(['sent', 'received'])
+                ->draw();
+
+        $graph[] =
+            (new VerticalBarGraph('api endpoints', $apiEndpoints))
+                ->setLegend($apiEndpointsLabels)
+                ->draw();
+
+        $graph[] =
+            (new VerticalBarGraph('api clients', $apiClients))
+            ->setLegend($apiClientsLabels)
+            ->draw();
+
         $this->graph = $graph;
+    }
+
+    protected function displayMiscData($dataset)
+    {
+        var_dump($dataset);
     }
 
     public function draw()
