@@ -3,7 +3,7 @@
 namespace ipl\Web\Widget;
 
 use ipl\Html\BaseHtmlElement;
-use ipl\Html\HtmlElement;
+use \Icinga\Util\Format;
 
 class PerfdataIcinga extends BaseHtmlElement
 {
@@ -33,6 +33,9 @@ class PerfdataIcinga extends BaseHtmlElement
 
         $idoQueryTimeValues = [];
         $idoQueryQueueValues = [];
+
+        $latency = [];
+        $executionTime = [];
         foreach ($perfdata as $key => $dataset) {
             $labelRaw = $dataset->getLabel();
 
@@ -94,6 +97,20 @@ class PerfdataIcinga extends BaseHtmlElement
                 }
             }
 
+            if (preg_match('/^(min)_(.*)|(max)_(.*)|(avg)_(.*)/', $labelRaw, $minMaxAvg)) {
+                $minMaxAvg = array_values(array_filter($minMaxAvg));
+
+                if ($minMaxAvg[2] === 'latency') {
+                    $latency[$minMaxAvg[1]] = $dataset->getValue();
+                } elseif ($minMaxAvg[2] === 'execution_time') {
+                    $executionTime[$minMaxAvg[1]] = $dataset->getValue();
+                } else {
+                    // todo maybe make a misc table then? or another dataset?
+                    var_dump($dataset);
+                    continue;
+                }
+            }
+
 
 //    $itemRateValues[] = round($dataset->getValue(), 2);
 //    $amountValues[] = round($dataset->getValue(), 2);
@@ -127,6 +144,18 @@ class PerfdataIcinga extends BaseHtmlElement
         $graph[] =
             (new VerticalBarGraph('ido query queue', $idoQueryQueueValues))
             ->setLegend(['queries rate', 'item count', 'item rate'])
+            ->draw();
+
+        $graph[] = (new HorizontalBar('Latency', $latency['avg']))
+            ->setMin($latency['min'])
+            ->setMax($latency['max'])
+            ->setForDisplay(Format::seconds($latency['avg']), '', Format::seconds($latency['max']))
+            ->draw();
+
+        $graph[] = (new HorizontalBar('Execution time', $executionTime['avg']))
+            ->setMin($executionTime['min'])
+            ->setMax($executionTime['max'])
+            ->setForDisplay(Format::seconds($executionTime['avg']), '', Format::seconds($executionTime['max']))
             ->draw();
 
         $this->graph = $graph;
