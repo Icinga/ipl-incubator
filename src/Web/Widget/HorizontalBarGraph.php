@@ -24,13 +24,14 @@ class HorizontalBarGraph extends BaseHtmlElement
     {
         $this->title = $title;
     }
-/**
- * Adds a bar
- *
- * @param HorizontalBar $bar
- *
- * @return $this
- */
+
+    /**
+     * Adds a bar
+     *
+     * @param HorizontalBar $bar
+     *
+     * @return $this
+     */
     public function addBar(HorizontalBar $bar)
     {
         $this->bars[] = $bar;
@@ -47,7 +48,7 @@ class HorizontalBarGraph extends BaseHtmlElement
             $graph[] = new HtmlElement(
                 'span',
                 new Attributes(['class' => 'perfdata-set-title']),
-                    $this->title
+                $this->title
             );
         }
 

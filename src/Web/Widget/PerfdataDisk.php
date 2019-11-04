@@ -23,15 +23,15 @@ class PerfdataDisk extends BaseHtmlElement
         foreach ($this->perfdata as $dataset) {
             $potMax = [
                 $dataset->toArray()['value'] => $dataset->getValue(),
-                $dataset->toArray()['warn'] => (float)$dataset->getWarningThreshold()->getMax(),
-                $dataset->toArray()['crit'] => (float)$dataset->getCriticalThreshold()->getMax()
+                $dataset->toArray()['warn'] => (float) $dataset->getWarningThreshold()->getMax(),
+                $dataset->toArray()['crit'] => (float) $dataset->getCriticalThreshold()->getMax()
             ];
             $displayMax = array_search(max($potMax), $potMax);
 
             $graph->addBar(
                 (new HorizontalBar($dataset->getLabel(), $dataset->getValue()))
-                    ->setWarn((float)$dataset->getWarningThreshold()->getMax())
-                    ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
+                    ->setWarn((float) $dataset->getWarningThreshold()->getMax())
+                    ->setCrit((float) $dataset->getCriticalThreshold()->getMax())
                     ->setForDisplay(Perfdata::splitValue($dataset->toArray()['value'])[1],
                         Perfdata::splitValue($dataset->toArray()['value'])[2],
                         $displayMax

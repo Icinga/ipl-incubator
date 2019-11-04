@@ -74,34 +74,6 @@ class Perfdata extends BaseHtmlElement
     }
 
     /**
-     * Whether the data is eligible for a bar
-     *
-     * @param $dataSet
-     *
-     * @return bool
-     */
-    protected function isEligibleForHorizontalBar($dataSet)
-    {
-        if (isset($dataSet['warn']) && $dataSet['warn'] !== null) {
-            return true;
-        }
-
-        if (isset($dataSet['crit']) && $dataSet['crit'] !== null) {
-            return true;
-        }
-
-        if (isset($dataSet['min']) && $dataSet['min']) {
-            return true;
-        }
-
-        if (isset($dataSet['max']) && $dataSet['max'] !== null) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Returns of labels, values and the common unit on success
      * Returns null if the data is incompatible
      *
@@ -170,5 +142,33 @@ class Perfdata extends BaseHtmlElement
         }
         preg_match('/(\d+\.?\d*)\s?(.*)/', $value, $matches);
         return $matches;
+    }
+
+    /**
+     * Whether the data is eligible for a bar
+     *
+     * @param $dataSet
+     *
+     * @return bool
+     */
+    protected function isEligibleForHorizontalBar($dataSet)
+    {
+        if (isset($dataSet['warn']) && $dataSet['warn'] !== null) {
+            return true;
+        }
+
+        if (isset($dataSet['crit']) && $dataSet['crit'] !== null) {
+            return true;
+        }
+
+        if (isset($dataSet['min']) && $dataSet['min']) {
+            return true;
+        }
+
+        if (isset($dataSet['max']) && $dataSet['max'] !== null) {
+            return true;
+        }
+
+        return false;
     }
 }

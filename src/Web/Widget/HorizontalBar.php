@@ -23,12 +23,12 @@ class HorizontalBar extends BaseHtmlElement
      * @var array
      */
     protected $data = [
-        'value'       => null,
-        'uom'         => null,
-        'warn'        => null,
-        'crit'        => null,
-        'min'         => null,
-        'max'         => null
+        'value'  => null,
+        'uom'    => null,
+        'warn'   => null,
+        'crit'   => null,
+        'min'    => null,
+        'max'    => null
     ];
 
     /**
@@ -131,7 +131,8 @@ class HorizontalBar extends BaseHtmlElement
     /**
      * Calculates data needed for drawing
      */
-    protected function calculateGraphData() {
+    protected function calculateGraphData()
+    {
 
         if ($this->data['crit'] !== null && $this->data['warn'] > $this->data['crit']) {
             $this->setInverted(true);
@@ -145,34 +146,44 @@ class HorizontalBar extends BaseHtmlElement
 
         $this->graphData['zero'] = $this->getRelativeValue(0 - $this->graphData['min'], $this->graphData['max'] - $this->graphData['min'], $this->graphData['bar-width']);
 
-        if (! isset($this->graphData['displayValue']))
-        {
+        if (! isset($this->graphData['displayValue'])) {
             $this->graphData['displayValue'] = $this->data['value'];
         }
 
-        if (! isset($this->graphData['displayMax']))
-        {
+        if (! isset($this->graphData['displayMax'])) {
             $this->graphData['displayMax'] = $this->data['max'];
         }
 
-        if (! isset($this->graphData['displayUom']))
-        {
+        if (! isset($this->graphData['displayUom'])) {
             $this->graphData['displayUom'] = $this->data['uom'];
         }
     }
 
     /**
+     * @param float|int $value
+     * @param float|int $relativeMax
+     * @param float|int $absoluteMax
+     *
+     * @return    float|int
+     */
+    protected function getRelativeValue($value, $relativeMax, $absoluteMax)
+    {
+        return ($value / $relativeMax * 100) * $absoluteMax / 100;
+    }
+
+    /**
      * @return HtmlElement
      */
-    protected function drawTitle() {
+    protected function drawTitle()
+    {
         $title = new HtmlElement(
             'text',
             new Attributes([
-                'class'         => 'svg-horizontal-title',
-                'fill'          => 'gray',
+                'class' => 'svg-horizontal-title',
+                'fill' => 'gray',
                 'dominant-baseline' => 'central',
-                'x'             => $this->outerMarginLeft ? $this->outerMarginTop + $this->textMargin : 0,
-                'y'             => $this->outerMarginTop + $this->barWidth / 2,
+                'x' => $this->outerMarginLeft ? $this->outerMarginTop + $this->textMargin : 0,
+                'y' => $this->outerMarginTop + $this->barWidth / 2,
             ]),
             new HtmlElement(
                 'tspan',
@@ -253,9 +264,9 @@ class HorizontalBar extends BaseHtmlElement
                     . 'q-4,0 -4,-4 '
                     . 'l0,-%s '
                     . 'q0,-4 4,-4',
-                    - $value - 4,
+                    -$value - 4,
                     $this->barWidth,
-                    - $value - 4,
+                    -$value - 4,
                     $this->barWidth - 8
                 );
 
@@ -323,7 +334,7 @@ class HorizontalBar extends BaseHtmlElement
                 . 'l0,%s '
                 . 'q0,4 -4,4 '
                 . 'l-1,0',
-            $this->barWidth - 9
+                $this->barWidth - 9
             );
 
             return new HtmlElement(
@@ -357,18 +368,6 @@ class HorizontalBar extends BaseHtmlElement
     }
 
     /**
-     * @param     float|int     $value
-     * @param     float|int     $relativeMax
-     * @param     float|int     $absoluteMax
-     *
-     * @return    float|int
-     */
-    protected function getRelativeValue($value, $relativeMax, $absoluteMax)
-    {
-        return ($value / $relativeMax * 100) * $absoluteMax / 100;
-    }
-
-    /**
      * @return string either neutral, ok, warning, critical
      */
     protected function getBarFill()
@@ -381,6 +380,7 @@ class HorizontalBar extends BaseHtmlElement
             if ($this->data['value'] < 0) {
                 return 'light-neutral';
             }
+
             return 'neutral';
         }
 
@@ -401,6 +401,30 @@ class HorizontalBar extends BaseHtmlElement
                 return 'ok';
             }
         }
+    }
+
+    /**
+     * Get this $inverted
+     *
+     * @return bool
+     */
+    public function isInverted()
+    {
+        return $this->inverted;
+    }
+
+    /**
+     * Set this $inverted
+     *
+     * @param bool $inverted
+     *
+     * @return $this
+     */
+    public function setInverted($inverted)
+    {
+        $this->inverted = $inverted;
+
+        return $this;
     }
 
     /**
@@ -429,9 +453,9 @@ class HorizontalBar extends BaseHtmlElement
         $values = new HtmlElement(
             'text',
             new Attributes([
-                'class'         => 'svg-text',
-                'x'             => $this->graphData['bar-x'] + $this->graphData['bar-width'] + $this->textMargin,
-                'y'             => $this->outerMarginTop + $this->barWidth / 2 + 4,
+                'class' => 'svg-text',
+                'x' => $this->graphData['bar-x'] + $this->graphData['bar-width'] + $this->textMargin,
+                'y' => $this->outerMarginTop + $this->barWidth / 2 + 4,
             ]),
             [
                 new HtmlElement(
@@ -445,30 +469,6 @@ class HorizontalBar extends BaseHtmlElement
         );
 
         return $values;
-    }
-
-    /**
-     * Get this $inverted
-     *
-     * @return bool
-     */
-    public function isInverted()
-    {
-        return $this->inverted;
-    }
-
-    /**
-     * Set this $inverted
-     *
-     * @param bool $inverted
-     *
-     * @return $this
-     */
-    public function setInverted($inverted)
-    {
-        $this->inverted = $inverted;
-
-        return $this;
     }
 
     public function getValue()

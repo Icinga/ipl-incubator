@@ -23,8 +23,8 @@ class PerfdataLoad extends BaseHtmlElement
         foreach ($this->perfdata as $dataset) {
             $graph->addBar(
                 (new HorizontalBar($dataset->toArray()['label'], $dataset->toArray()['value']))
-                    ->setWarn((float)$dataset->getWarningThreshold()->getMax())
-                    ->setCrit((float)$dataset->getCriticalThreshold()->getMax())
+                    ->setWarn((float) $dataset->getWarningThreshold()->getMax())
+                    ->setCrit((float) $dataset->getCriticalThreshold()->getMax())
             );
         }
         $this->setContent($graph->draw());

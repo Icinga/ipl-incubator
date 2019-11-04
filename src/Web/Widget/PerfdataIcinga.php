@@ -167,9 +167,9 @@ class PerfdataIcinga extends BaseHtmlElement
 
         $graph[] =
             (new VerticalBarGraph('numbers services', $numServicesStates))
-            ->addDataSet('number hosts', $numHostsStates)
-            ->setLegend(array_merge($labelsServicesStates, $labelsHostsStates))
-            ->draw();
+                ->addDataSet('number hosts', $numHostsStates)
+                ->setLegend(array_merge($labelsServicesStates, $labelsHostsStates))
+                ->draw();
 
         $graph[] =
             (new VerticalBarGraph('item rates', $itemRateValues))
@@ -178,25 +178,25 @@ class PerfdataIcinga extends BaseHtmlElement
 
         $graph[] =
             (new VerticalBarGraph('active service checks', $activeServicesValues))
-            ->addDataSet('active host checks', $activeHostsValues)
-            ->setLegend(['1 min', '5 min', '15 min', 'per second'])
-            ->draw();
+                ->addDataSet('active host checks', $activeHostsValues)
+                ->setLegend(['1 min', '5 min', '15 min', 'per second'])
+                ->draw();
 
         $graph[] =
             (new VerticalBarGraph('passive service checks', $passiveServicesValues))
-            ->addDataSet('passive host checks', $passiveHostsValues)
-            ->setLegend(['1 min', '5 min', '15 min', 'per second'])
-            ->draw();
+                ->addDataSet('passive host checks', $passiveHostsValues)
+                ->setLegend(['1 min', '5 min', '15 min', 'per second'])
+                ->draw();
 
         $graph[] =
             (new VerticalBarGraph('ido query times', $idoQueryTimeValues))
-            ->setLegend(['1 min', '5 min', '15 min'])
-            ->draw();
+                ->setLegend(['1 min', '5 min', '15 min'])
+                ->draw();
 
         $graph[] =
             (new VerticalBarGraph('ido query queue', $idoQueryQueueValues))
-            ->setLegend(['queries rate', 'item count', 'item rate'])
-            ->draw();
+                ->setLegend(['queries rate', 'item count', 'item rate'])
+                ->draw();
 
         $graph[] = (new HorizontalBar('Latency', $latency['avg']))
             ->setMin($latency['min'])
@@ -224,8 +224,8 @@ class PerfdataIcinga extends BaseHtmlElement
 
         $graph[] =
             (new VerticalBarGraph('api clients', $apiClients))
-            ->setLegend($apiClientsLabels)
-            ->draw();
+                ->setLegend($apiClientsLabels)
+                ->draw();
 
         $this->graph = $graph;
     }

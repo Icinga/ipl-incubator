@@ -192,10 +192,10 @@ class VerticalBarGraph extends BaseHtmlElement
             $label = $i * $this->graphData['jump'] + $this->graphData['start'];
 
             $height = $this->outerMarginTop + ($this->graphHeight - $this->getRelativeValue(
-                $i * $this->graphData['jump'],
-                $this->getAmountLines() * $this->graphData['jump'],
-                $this->graphHeight
-            ));
+                        $i * $this->graphData['jump'],
+                        $this->getAmountLines() * $this->graphData['jump'],
+                        $this->graphHeight
+                    ));
 
             $lines[] = new HtmlElement(
                 'g',
@@ -204,11 +204,11 @@ class VerticalBarGraph extends BaseHtmlElement
                     new HtmlElement(
                         'text',
                         new Attributes([
-                            'class'         => 'svg-text',
-                            'x'             => $this->outerMarginLeft,
-                            'y'             => $height + 4,
-                            'fill'          => 'grey',
-                            'text-anchor'   => 'end'
+                            'class' => 'svg-text',
+                            'x' => $this->outerMarginLeft,
+                            'y' => $height + 4,
+                            'fill' => 'grey',
+                            'text-anchor' => 'end'
                         ]),
                         $label
                     ),
@@ -245,11 +245,11 @@ class VerticalBarGraph extends BaseHtmlElement
                 new HtmlElement(
                     'text',
                     new Attributes([
-                        'class'         => 'svg-text',
-                        'x'             => $this->outerMarginLeft,
-                        'y'             => $graphMarginTop + 4,
-                        'fill'          => 'grey',
-                        'text-anchor'   => 'end'
+                        'class' => 'svg-text',
+                        'x' => $this->outerMarginLeft,
+                        'y' => $graphMarginTop + 4,
+                        'fill' => 'grey',
+                        'text-anchor' => 'end'
                     ]),
                     $this->graphData['start']
                 ),
@@ -292,10 +292,10 @@ class VerticalBarGraph extends BaseHtmlElement
                 new HtmlElement(
                     'text',
                     new Attributes([
-                        'class'         => 'svg-text',
-                        'fill'          => 'gray',
-                        'text-anchor'   => 'middle',
-                        'transform'     => sprintf(
+                        'class' => 'svg-text',
+                        'fill' => 'gray',
+                        'text-anchor' => 'middle',
+                        'transform' => sprintf(
                             'translate(%s, %s)',
                             ($width + $this->textMargin) / 2 + $this->outerMarginLeft,
                             $this->graphHeight + $this->outerMarginTop + $this->textMargin + 10
@@ -332,11 +332,11 @@ class VerticalBarGraph extends BaseHtmlElement
             $graphText = new HtmlElement(
                 'text',
                 new Attributes([
-                    'class'         => 'svg-text',
-                    'text-anchor'   => 'middle',
-                    'x'             => $this->getBarWidth() / 2,
-                    'y'             => '-2',
-                    'fill'          => 'grey'
+                    'class' => 'svg-text',
+                    'text-anchor' => 'middle',
+                    'x' => $this->getBarWidth() / 2,
+                    'y' => '-2',
+                    'fill' => 'grey'
                 ]),
                 $datum
             );
@@ -358,9 +358,9 @@ class VerticalBarGraph extends BaseHtmlElement
                 [
                     new HtmlElement('path',
                         new Attributes([
-                            'd'     => $this->getPathString($height, $this->getBarWidth()),
+                            'd' => $this->getPathString($height, $this->getBarWidth()),
                             'class' => 'bar-' . $order,
-                            'fill'  => sprintf('#%06X', mt_rand(0, 0xFFFFFF))
+                            'fill' => sprintf('#%06X', mt_rand(0, 0xFFFFFF))
                         ])
                     ),
                     $graphText
@@ -397,11 +397,11 @@ class VerticalBarGraph extends BaseHtmlElement
                         'class' => 'svg-legend-text svg-text',
                         'transform' => 'translate(' . ($this->textMargin) . ',0)'
                     ]),
-                $legendItem)
+                    $legendItem)
             ]);
         }
 
-        return new HtmlElement('g', new Attributes(['class' => 'svg-legend-item', 'transform' => 'translate(' . ($this->totalWidth + $this->textMargin * 2). ',' . ($this->outerMarginTop + $this->textMargin) . ')']), $legend);
+        return new HtmlElement('g', new Attributes(['class' => 'svg-legend-item', 'transform' => 'translate(' . ($this->totalWidth + $this->textMargin * 2) . ',' . ($this->outerMarginTop + $this->textMargin) . ')']), $legend);
     }
 
     /**
@@ -458,6 +458,7 @@ class VerticalBarGraph extends BaseHtmlElement
         if ($relativeMax == 0 || $absoluteMax == 0) {
             return 0;
         }
+
         return ($value / $relativeMax * 100) * $absoluteMax / 100;
     }
 
@@ -538,6 +539,7 @@ class VerticalBarGraph extends BaseHtmlElement
     public function setAmountLines($amountLines)
     {
         $this->amountLines = $amountLines;
+
         return $this;
     }
 
@@ -561,6 +563,7 @@ class VerticalBarGraph extends BaseHtmlElement
     public function setBarWidth($barWidth)
     {
         $this->barWidth = $barWidth;
+
         return $this;
     }
 }
