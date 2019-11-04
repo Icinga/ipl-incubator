@@ -5,6 +5,7 @@ namespace ipl\Web\Widget;
 use ipl\Html\Attributes;
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\HtmlElement;
+use ipl\Html\Table;
 
 class Perfdata extends BaseHtmlElement
 {
@@ -14,7 +15,9 @@ class Perfdata extends BaseHtmlElement
 
     public function __construct($perfdata, $command)
     {
-    switch ($command) {
+        $miscTable = null;
+
+        switch ($command) {
         case 'load':
             $this->setContent((new PerfdataLoad($perfdata))->draw());
             break;
@@ -61,9 +64,12 @@ class Perfdata extends BaseHtmlElement
                             )
                             ->draw();
                     } else {
-                        // todo ? format
-                        $displayedData[] = new HtmlElement('p', null, $dataSet->__toString());
+                        $this->addMiscData($dataSet->toArray(), $miscTable);
                     }
+                }
+
+                if ($miscTable !== null) {
+                    $displayedData[] = $miscTable;
                 }
             }
 
@@ -77,7 +83,7 @@ class Perfdata extends BaseHtmlElement
      * Returns of labels, values and the common unit on success
      * Returns null if the data is incompatible
      *
-     * @param $perfdata
+     * @param  $perfdata
      *
      * @return array|null
      */
@@ -112,6 +118,13 @@ class Perfdata extends BaseHtmlElement
         return null;
     }
 
+    /**
+     * Cleans out empty values from the perfdata array and splits the value from the unit
+     *
+     * @param $dataSet
+     *
+     * @return mixed
+     */
     protected function formatDataSet($dataSet)
     {
         foreach ($dataSet as $key => &$value) {
@@ -131,7 +144,7 @@ class Perfdata extends BaseHtmlElement
     /**
      * Splits a string into a float and the unit attached
      *
-     * @param $value
+     * @param  $value
      *
      * @return array
      */
@@ -170,5 +183,25 @@ class Perfdata extends BaseHtmlElement
         }
 
         return false;
+    }
+
+    /**
+     * Fills the misc data table with the label to value pairs
+     *
+     * @param  $data
+     * @param  $table
+     *
+     * @return Table
+     */
+    protected function addMiscData($data, &$table)
+    {
+        if ($table === null) {
+            $table = new Table();
+            $table->add(Table::row(['label', 'value'], null, 'th'));
+        }
+
+        $table->add(Table::row([$data['label'], $data['value']]));
+
+        return $table;
     }
 }
