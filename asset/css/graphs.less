@@ -1,0 +1,107 @@
+.perfdata-heading {
+  font-size: 1em;
+  font-weight: unset;
+}
+
+.svg-title {
+  fill: @text-color;
+  font-weight: bold;
+}
+
+.svg-text {
+  fill: @gray;
+}
+
+.perfdata-wrapper svg.svg-half {
+  width: 20em;
+}
+
+.vertical-bar-graph {
+  height: 14em;
+
+  .svg-legend-ball-0,
+  .bar-0 {
+    fill: #0095bf;
+  }
+  .svg-legend-ball-1,
+  .bar-1 {
+    fill: #4dd9b9;
+  }
+  .svg-legend-ball-2,
+  .bar-2 {
+    fill: #a1f7c9;
+  }
+  .svg-legend-ball-3,
+  .bar-3 {
+    fill: #888;
+  }
+  .svg-legend-ball-4,
+  .bar-4 {
+    fill: #333;
+  }
+}
+
+.horizontal-bar-graph,
+.horizontal-bar {
+  max-width: 50em;
+  display: block;
+}
+
+.horizontal-bar {
+  .bar-neutral {
+    fill: #0095bf;
+  }
+
+  .bar-light-neutral {
+    fill: #4dd9b9;
+  }
+
+  .bar-ok {
+    fill: @color-ok;
+  }
+
+  .threshold-warning,
+  .bar-warning {
+    fill: @color-warning;
+    &.round {
+      stroke: @color-warning;
+      fill: transparent;
+    }
+  }
+
+  .threshold-critical,
+  .bar-critical {
+    fill: @color-critical;
+    &.round {
+      stroke: @color-critical;
+      fill: transparent;
+    }
+  }
+
+  .threshold-black {
+    fill: @black;
+    &.round {
+      stroke: @black;
+      fill: transparent;
+    }
+  }
+
+  .svg-horizontal-title {
+    fill: @text-color;
+  }
+
+  .svg-horizontal-label {
+    font-size: 0.95em;
+    fill: @text-color;
+  }
+
+  .svg-horizontal-value {
+    fill: @text-color;
+    font-size: 1em;
+  }
+
+  .svg-horizontal-max {
+    fill: @text-color-light;
+    font-size: 0.8em;
+  }
+}
