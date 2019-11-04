@@ -167,19 +167,10 @@ class Perfdata extends BaseHtmlElement
      */
     protected function isEligibleForHorizontalBar($dataSet)
     {
-        if (isset($dataSet['warn']) && $dataSet['warn'] !== null) {
-            return true;
-        }
-
-        if (isset($dataSet['crit']) && $dataSet['crit'] !== null) {
-            return true;
-        }
-
-        if (isset($dataSet['min']) && $dataSet['min']) {
-            return true;
-        }
-
-        if (isset($dataSet['max']) && $dataSet['max'] !== null) {
+        if (isset($dataSet['warn']) && $dataSet['warn'] !== null
+            || isset($dataSet['crit']) && $dataSet['crit'] !== null
+            || isset($dataSet['min']) && $dataSet['min']
+            || isset($dataSet['max']) && $dataSet['max'] !== null) {
             return true;
         }
 
