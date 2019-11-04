@@ -4,6 +4,7 @@ namespace fpl\Web\Widget;
 
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\HtmlElement;
+use ipl\Html\Table;
 
 class PerfdataHttp extends BaseHtmlElement
 {
@@ -38,9 +39,13 @@ class PerfdataHttp extends BaseHtmlElement
     public function draw()
     {
         $content = [
-            new HtmlElement('p', null, 'size: ' . $this->size),
-            $this->graph->draw()
-        ];
+            (new Table())
+                ->addAttributes(['class' => 'name-value-table'])
+                ->add(new HtmlElement('tr', null, [
+                    new HtmlElement('th', null, 'size'),
+                    new HtmlElement('td', null, $this->size)
+                ])),
+            $this->graph->draw()];
 
         $this->setContent($content);
 

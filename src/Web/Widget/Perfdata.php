@@ -188,11 +188,13 @@ class Perfdata extends BaseHtmlElement
     protected function addMiscData($data, &$table)
     {
         if ($table === null) {
-            $table = new Table();
-            $table->add(Table::row(['label', 'value'], null, 'th'));
+            $table = (new Table())->addAttributes(['class' => 'name-value-table']);
         }
 
-        $table->add(Table::row([$data['label'], $data['value']]));
+        $table->add(new HtmlElement('tr', null, [
+            new HtmlElement('th', null, $data['label']),
+            new HtmlElement('td', null, $data['value'])
+        ]));
 
         return $table;
     }
