@@ -2,7 +2,9 @@
 
 namespace fpl\Web\Widget;
 
+use ipl\Html\Attributes;
 use ipl\Html\BaseHtmlElement;
+use ipl\Html\HtmlElement;
 use \Icinga\Util\Format;
 
 class PerfdataIcinga extends BaseHtmlElement
@@ -13,7 +15,7 @@ class PerfdataIcinga extends BaseHtmlElement
 
     protected $size;
 
-    protected $graph;
+    protected $data;
 
     public function __construct($perfdata)
     {
@@ -165,69 +167,78 @@ class PerfdataIcinga extends BaseHtmlElement
 //        }
 //        echo $perfdataStr;
 
-        $graph[] =
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Host and Service States:'));
+        $content[] =
             (new VerticalBarGraph('numbers services', $numServicesStates))
                 ->addDataSet('number hosts', $numHostsStates)
                 ->setLegend(array_merge($labelsServicesStates, $labelsHostsStates))
                 ->draw();
 
-        $graph[] =
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Json API RPC:'));
+        $content[] =
             (new VerticalBarGraph('item rates', $itemRateValues))
                 ->addDataSet('amount items', $amountValues)
                 ->setLegend($apiNumLegendItems)->draw();
 
-        $graph[] =
-            (new VerticalBarGraph('active service checks', $activeServicesValues))
-                ->addDataSet('active host checks', $activeHostsValues)
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Active Checks:'));
+        $content[] =
+            (new VerticalBarGraph('services', $activeServicesValues))
+                ->addDataSet('hosts', $activeHostsValues)
                 ->setLegend(['1 min', '5 min', '15 min', 'per second'])
                 ->draw();
 
-        $graph[] =
-            (new VerticalBarGraph('passive service checks', $passiveServicesValues))
-                ->addDataSet('passive host checks', $passiveHostsValues)
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Passive Checks:'));
+        $content[] =
+            (new VerticalBarGraph('services', $passiveServicesValues))
+                ->addDataSet('hosts', $passiveHostsValues)
                 ->setLegend(['1 min', '5 min', '15 min', 'per second'])
                 ->draw();
 
-        $graph[] =
-            (new VerticalBarGraph('ido query times', $idoQueryTimeValues))
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'IDO MySQL queries:'));
+        $content[] =
+            (new VerticalBarGraph('query times', $idoQueryTimeValues))
                 ->setLegend(['1 min', '5 min', '15 min'])
+                ->addAttributes(['class' => 'svg-half'])
                 ->draw();
-
-        $graph[] =
-            (new VerticalBarGraph('ido query queue', $idoQueryQueueValues))
+        $content[] =
+            (new VerticalBarGraph('query queue', $idoQueryQueueValues))
                 ->setLegend(['queries rate', 'item count', 'item rate'])
+                ->addAttributes(['class' => 'svg-half'])
                 ->draw();
 
-        $graph[] = (new HorizontalBar('Latency', $latency['avg']))
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Min | Avg | Max'));
+        $content[] = (new HorizontalBar('Latency', $latency['avg']))
             ->setMin($latency['min'])
             ->setMax($latency['max'])
             ->setForDisplay(Format::seconds($latency['avg']), '', Format::seconds($latency['max']))
             ->draw();
-
-        $graph[] = (new HorizontalBar('Execution time', $executionTime['avg']))
+        $content[] = (new HorizontalBar('Execution time', $executionTime['avg']))
             ->setMin($executionTime['min'])
             ->setMax($executionTime['max'])
             ->setForDisplay(Format::seconds($executionTime['avg']), '', Format::seconds($executionTime['max']))
             ->draw();
 
-        $graph[] =
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Sent and Received:'));
+        $content[] =
             (new VerticalBarGraph('last messages', $lastMessages))
                 ->addDataSet('sum bytes', $sumBytes)
                 ->addDataSet('sum messages', $sumMessages)
                 ->setLegend(['sent', 'received'])
                 ->draw();
 
-        $graph[] =
+        $content[] = (new HtmlElement('h3', new Attributes(['class' => 'perfdata-heading']), 'Api Endpoints and Clients'));
+        $content[] =
             (new VerticalBarGraph('api endpoints', $apiEndpoints))
                 ->setLegend($apiEndpointsLabels)
+                ->addAttributes(['class' => 'svg-half'])
                 ->draw();
-
-        $graph[] =
+        $content[] =
             (new VerticalBarGraph('api clients', $apiClients))
                 ->setLegend($apiClientsLabels)
+                ->addAttributes(['class' => 'svg-half'])
                 ->draw();
 
-        $this->graph = $graph;
+        $this->data = $content;
     }
 
     protected function displayMiscData($dataset)
@@ -238,7 +249,7 @@ class PerfdataIcinga extends BaseHtmlElement
     public function draw()
     {
         $content = [
-            $this->graph
+            $this->data
         ];
 
         $this->setContent($content);
