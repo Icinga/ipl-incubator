@@ -6,6 +6,7 @@ use ipl\Html\Attributes;
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\HtmlElement;
 use ipl\Html\Table;
+use Icinga\Module\Monitoring\Plugin\Perfdata as MonitoringPerfdata;
 
 class Perfdata extends BaseHtmlElement
 {
@@ -83,13 +84,13 @@ class Perfdata extends BaseHtmlElement
      * Returns of labels, values and the common unit on success
      * Returns null if the data is incompatible
      *
-     * @param  $perfdata
+     * @param  MonitoringPerfdata[] $perfdata
      *
      * @return array|null
      */
     protected function calculateVerticalGraph($perfdata)
     {
-        if ($this->count($perfdata) <= 1) {
+        if (count($perfdata) <= 1) {
             return null;
         }
 
