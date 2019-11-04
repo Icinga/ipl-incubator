@@ -1,6 +1,6 @@
 <?php
 
-namespace ipl\Web\Widget;
+namespace fpl\Web\Widget;
 
 use ipl\Html\BaseHtmlElement;
 use \Icinga\Util\Format;
