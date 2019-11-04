@@ -149,7 +149,7 @@ class VerticalBarGraph extends BaseHtmlElement
             $this->totalWidth += 100;
         }
 
-        $this->addAttributes(['viewbox' => '0 0 ' . $this->totalWidth . ' 150']);
+        $this->addAttributes(['viewbox' => '0 0 ' . $this->totalWidth > 500 ? $this->totalWidth : 500 . ' 150']);
 
         $this->setContent($graph);
 
@@ -401,7 +401,17 @@ class VerticalBarGraph extends BaseHtmlElement
             ]);
         }
 
-        return new HtmlElement('g', new Attributes(['class' => 'svg-legend-item', 'transform' => 'translate(' . ($this->totalWidth + $this->textMargin * 2) . ',' . ($this->outerMarginTop + $this->textMargin) . ')']), $legend);
+        return new HtmlElement(
+            'g',
+            new Attributes(
+                [
+                    'class' => 'svg-legend-item',
+                    'transform' => sprintf('translate(%s,%s)',
+                        $this->totalWidth + $this->textMargin * 2,
+                        $this->outerMarginTop + $this->textMargin
+                    )
+                ]),
+            $legend);
     }
 
     /**
