@@ -8,7 +8,7 @@ use ipl\Html\HtmlElement;
 
 class HorizontalBar extends BaseHtmlElement
 {
-    const BAR_WIDTH = 10;
+    const BAR_HEIGHT = 10;
 
     const OUTER_MARGIN_TOP = 0;
 
@@ -51,7 +51,7 @@ class HorizontalBar extends BaseHtmlElement
      *
      * @var int
      */
-    protected $barWidth = self::BAR_WIDTH;
+    protected $barHeight = self::BAR_HEIGHT;
 
     /**
      * Margin to the left of the svg
@@ -101,7 +101,7 @@ class HorizontalBar extends BaseHtmlElement
         $this->addAttributes(['viewbox' => sprintf(
             '0 0 %s %s',
             $this->totalWidth,
-            (2 * $this->outerMarginTop + $this->barWidth)
+            (2 * $this->outerMarginTop + $this->barHeight)
         )]);
 
         $this->title = $title;
@@ -183,7 +183,7 @@ class HorizontalBar extends BaseHtmlElement
                 'fill' => 'gray',
                 'dominant-baseline' => 'central',
                 'x' => $this->outerMarginLeft ? $this->outerMarginTop + $this->textMargin : 0,
-                'y' => $this->outerMarginTop + $this->barWidth / 2,
+                'y' => $this->outerMarginTop + $this->barHeight / 2,
             ]),
             new HtmlElement(
                 'tspan',
@@ -208,7 +208,7 @@ class HorizontalBar extends BaseHtmlElement
                         'x' => $this->graphData['bar-x'],
                         'y' => $this->outerMarginTop,
                         'width' => $this->graphData['bar-width'],
-                        'height' => $this->barWidth,
+                        'height' => $this->barHeight,
                         'rx' => 4,
                         'fill' => 'lightgray'
                     ]
@@ -250,7 +250,7 @@ class HorizontalBar extends BaseHtmlElement
                     . 'q0,4 -4,4 '
                     . 'l-%s,0',
                     $value - 4,
-                    $this->barWidth - 8,
+                    $this->barHeight - 8,
                     $value - 4
                 );
 
@@ -265,9 +265,9 @@ class HorizontalBar extends BaseHtmlElement
                     . 'l0,-%s '
                     . 'q0,-4 4,-4',
                     -$value - 4,
-                    $this->barWidth,
+                    $this->barHeight,
                     -$value - 4,
-                    $this->barWidth - 8
+                    $this->barHeight - 8
                 );
 
                 $xPos = $this->graphData['zero'] + $value;
@@ -279,7 +279,7 @@ class HorizontalBar extends BaseHtmlElement
                     new Attributes(
                         [
                             'transform' => sprintf('translate(%s,%s)', $this->graphData['bar-x'] + $xPos, $this->outerMarginTop),
-                            'height' => $this->barWidth,
+                            'height' => $this->barHeight,
                             'd' => $path,
                             'class' => sprintf('bar-%s', $this->getBarFill())
                         ]
@@ -297,7 +297,7 @@ class HorizontalBar extends BaseHtmlElement
                             'x' => $this->graphData['bar-x'],
                             'y' => $this->outerMarginTop,
                             'width' => $end - $start,
-                            'height' => $this->barWidth,
+                            'height' => $this->barHeight,
                             'rx' => 4,
                             'class' => sprintf('bar-%s', $this->getBarFill())
                         ]
@@ -334,7 +334,7 @@ class HorizontalBar extends BaseHtmlElement
                 . 'l0,%s '
                 . 'q0,4 -4,4 '
                 . 'l-1,0',
-                $this->barWidth - 9
+                $this->barHeight - 9
             );
 
             return new HtmlElement(
@@ -344,7 +344,7 @@ class HorizontalBar extends BaseHtmlElement
                         'transform' => sprintf('translate(%s,%s)', $this->graphData['bar-x'] + $this->graphData['bar-width'] - 5, $this->outerMarginTop),
                         'd' => $path,
                         'width' => 1,
-                        'height' => $this->barWidth,
+                        'height' => $this->barHeight,
                         'class' => sprintf('threshold-%s round', $col)
                     ]
                 )
@@ -360,7 +360,7 @@ class HorizontalBar extends BaseHtmlElement
                     'x' => $this->graphData['bar-x'] + $threshold + $this->graphData['zero'],
                     'y' => $this->outerMarginTop,
                     'width' => 1,
-                    'height' => $this->barWidth,
+                    'height' => $this->barHeight,
                     'class' => sprintf('threshold-%s', $col)
                 ]
             )
@@ -455,7 +455,7 @@ class HorizontalBar extends BaseHtmlElement
             new Attributes([
                 'class' => 'svg-text',
                 'x' => $this->graphData['bar-x'] + $this->graphData['bar-width'] + $this->textMargin,
-                'y' => $this->outerMarginTop + $this->barWidth / 2 + 4,
+                'y' => $this->outerMarginTop + $this->barHeight / 2 + 4,
             ]),
             [
                 new HtmlElement(
